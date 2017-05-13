@@ -1,6 +1,7 @@
 package com.cd.bot.config;
 
 import com.cd.bot.robot.RobotWrapper;
+import com.cd.bot.system.ProcessManager;
 import com.cd.bot.tesseract.ImagePreProcessor;
 import com.cd.bot.tesseract.TesseractWrapper;
 import net.sourceforge.tess4j.TessAPI1;
@@ -77,5 +78,35 @@ public class BotConfig {
     @Bean
     public Integer scalingFactor() {
         return Integer.parseInt(environment.getRequiredProperty("image.scaling.factor"));
+    }
+
+    @Bean
+    public ProcessManager processMonitor() {
+        return new ProcessManager();
+    }
+
+    @Bean
+    public String executableName() {
+        return environment.getRequiredProperty("executable.name");
+    }
+
+    @Bean
+    public String executableDir() {
+        return environment.getRequiredProperty("executable.dir");
+    }
+
+    @Bean
+    public Boolean executableShortcutOnly() {
+        return Boolean.parseBoolean(environment.getProperty("executable.shortcut.only"));
+    }
+
+    @Bean
+    public Integer executableXOffset() {
+        return Integer.parseInt(environment.getProperty("executable.x.offset"));
+    }
+
+    @Bean
+    public Integer executableYOffset() {
+        return Integer.parseInt(environment.getProperty("executable.y.offset"));
     }
 }

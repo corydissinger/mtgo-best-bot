@@ -8,6 +8,7 @@ import com.cd.bot.akka.RobotActor;
 import com.cd.bot.robot.RobotWrapper;
 import com.cd.bot.system.ProcessManager;
 import com.cd.bot.tesseract.ImagePreProcessor;
+import com.cd.bot.tesseract.RawLinesProcessor;
 import com.cd.bot.tesseract.TesseractWrapper;
 import net.sourceforge.tess4j.TessAPI1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,5 +144,10 @@ public class BotConfig {
     @Bean
     public Inbox inbox() {
         return Inbox.create(actorSystem());
+    }
+
+    @Bean
+    public RawLinesProcessor rawLinesProcessor() {
+        return new RawLinesProcessor();
     }
 }

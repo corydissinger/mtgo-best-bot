@@ -18,6 +18,7 @@ public class RobotActor extends AbstractActor {
     static public class MouseClickEvent {
         private int xOffset;
         private int yOffset;
+        private boolean isDouble;
 
         public int getxOffset() {
             return xOffset;
@@ -34,6 +35,14 @@ public class RobotActor extends AbstractActor {
         public void setyOffset(int yOffset) {
             this.yOffset = yOffset;
         }
+
+        public boolean isDouble() {
+            return isDouble;
+        }
+
+        public void setDouble(boolean aDouble) {
+            isDouble = aDouble;
+        }
     }
 
     static public class InputStringEvent {
@@ -48,8 +57,9 @@ public class RobotActor extends AbstractActor {
         }
     }
 
-    static public class ApplicationServerResponseAwaitEvent {
-    }
+    static public class ApplicationServerResponseAwaitEvent {}
+
+    static public class EventSuccessEvent {}
 
     public RobotActor() {}
     
@@ -60,10 +70,16 @@ public class RobotActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(MouseClickEvent.class, e -> {
+                    if(e.isDouble()) {
+                        robotWrapper.doubleClickAtLocation(e.getxOffset(), e.getyOffset());
+                    } else {
+                        robotWrapper.singleClickAtLocation(e.getxOffset(), e.getyOffset());
+                    }
 
+                    getSender().tell(new ApplicationServerResponseAwaitEvent(), getSelf());
                 }).match(InputStringEvent.class, e -> {
                     robotWrapper.writeString(e.getTextToInput());
-                    getSender().tell(new Object(), getSelf());
+                    getSender().tell(new EventSuccessEvent(), getSelf());
                 }).match(ApplicationServerResponseAwaitEvent.class, e -> {
 
                 })

@@ -1,5 +1,7 @@
 package com.cd.bot.tesseract;
 
+import com.cd.bot.tesseract.model.RawLines;
+import com.cd.bot.tesseract.model.TesseractRectangle;
 import com.sun.jna.Pointer;
 import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.TessAPI1;
@@ -7,6 +9,7 @@ import net.sourceforge.tess4j.util.ImageIOHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -25,12 +28,15 @@ public class TesseractWrapper {
     @Autowired
     private ImagePreProcessor imagePreProcessor;
 
-    public List<String> getRawText(BufferedImage bi) {
+    @Autowired
+    private Integer scalingFactor;
+
+    public RawLines getRawText(BufferedImage bi, TesseractRectangle targetArea) {
         Long startTime = System.currentTimeMillis();
         BufferedImage newImage = null;
 
         try {
-            newImage = imagePreProcessor.preprocess(bi);
+            newImage = imagePreProcessor.preprocess(bi, targetArea);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,6 +57,7 @@ public class TesseractWrapper {
         ITessAPI.ETEXT_DESC monitor = new ITessAPI.ETEXT_DESC();
 
         TessAPI1.TessBaseAPISetImage(tesseract, buffer, newImage.getWidth(), newImage.getHeight(), bytespp, bytespl);
+
         TessAPI1.TessBaseAPIRecognize(tesseract, monitor);
 
         ITessAPI.TessResultIterator ri = TessAPI1.TessBaseAPIGetIterator(tesseract);
@@ -62,6 +69,11 @@ public class TesseractWrapper {
 
         do {
             Pointer symbol = TessAPI1.TessResultIteratorGetUTF8Text(ri, level);
+
+            if(symbol == null) {
+                continue;
+            }
+
             float conf = TessAPI1.TessResultIteratorConfidence(ri, level);
 
             confidences.add(conf);
@@ -73,6 +85,15 @@ public class TesseractWrapper {
         System.out.println("Avg conf: " + confidences.stream().reduce(0f, (sum, next) -> sum + next) / confidences.size());
         System.out.println("Completed in " + (endTime - startTime) + " milliseconds");
 
-        return rawLines;
+        RawLines rawLinesObj = new RawLines();
+
+        rawLinesObj.setRawLines(rawLines);
+        rawLinesObj.setConfidences(confidences);
+
+        return rawLinesObj;
+    }
+
+    public RawLines getRawText(BufferedImage bi) {
+        return getRawText(bi, null);
     }
 }

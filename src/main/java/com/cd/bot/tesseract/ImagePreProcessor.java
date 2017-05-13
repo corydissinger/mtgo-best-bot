@@ -1,5 +1,6 @@
 package com.cd.bot.tesseract;
 
+import com.cd.bot.tesseract.model.TesseractRectangle;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,8 +56,12 @@ public class ImagePreProcessor {
         return bimage;
     }
 
-    public BufferedImage preprocess(BufferedImage bi) throws IOException {
-        BufferedImage grayScaled = getGrayscaledImage(bi);
+    public BufferedImage preprocess(BufferedImage bi, TesseractRectangle targetArea) throws IOException {
+        BufferedImage grayScaled = getGrayscaledImage(targetArea != null ? bi.getSubimage(targetArea.getLeft(),
+                                                                                          targetArea.getTop(),
+                                                                                          targetArea.getWidth(),
+                                                                                          targetArea.getHeight())
+                                                                                        : bi);
 
         return Thumbnails.of(grayScaled)
                          .scale(new Double(scalingFactor))

@@ -55,7 +55,11 @@ public class RobotWrapper {
         //Clean up any state we keep track of
     }
 
-    private void doubleClickAtLocation(int xOff, int yOff) {
+    public void singleClickAtLocation(int xOff, int yOff) {
+        mouseEventAtLocation(InputEvent.BUTTON1_DOWN_MASK, xOff, yOff);
+    }
+
+    public void doubleClickAtLocation(int xOff, int yOff) {
         mouseEventAtLocation(InputEvent.BUTTON1_DOWN_MASK, xOff, yOff);
         try {
             Thread.sleep(50);

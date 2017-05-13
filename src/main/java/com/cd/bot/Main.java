@@ -1,5 +1,8 @@
 package com.cd.bot;
 
+import akka.actor.ActorRef;
+import akka.actor.Inbox;
+import com.cd.bot.akka.RobotActor;
 import com.cd.bot.config.BotConfig;
 import com.cd.bot.robot.RobotWrapper;
 import com.cd.bot.robot.exception.ApplicationDownException;
@@ -18,20 +21,28 @@ public class Main {
 
         TesseractWrapper tesseractWrapper = (TesseractWrapper) applicationContext.getBean("tesseractWrapper");
         RobotWrapper robotWrapper = (RobotWrapper) applicationContext.getBean("robotWrapper");
+        ActorRef robotRef = (ActorRef) applicationContext.getBean("robotRef");
+        Inbox inbox = (Inbox) applicationContext.getBean("inbox");
 
-        do {
-            BufferedImage bi = null;
-            try {
-                bi = robotWrapper.getCurrentScreen();
-            } catch (ApplicationDownException e) {
-                e.printStackTrace();
-                robotWrapper.reInit();
-            }
+        RobotActor.InputStringEvent e = new RobotActor.InputStringEvent();
 
-            List<String> bleh = tesseractWrapper.getRawText(bi);
+        e.setTextToInput("Nova4545");
 
-            bleh.stream().forEach(aBleh -> System.out.println(aBleh));
-        } while(true);
+        inbox.send(robotRef, e);
+
+//        do {
+//            BufferedImage bi = null;
+//            try {
+//                bi = robotWrapper.getCurrentScreen();
+//            } catch (ApplicationDownException e) {
+//                e.printStackTrace();
+//                robotWrapper.reInit();
+//            }
+//
+//            List<String> bleh = tesseractWrapper.getRawText(bi);
+//
+//            bleh.stream().forEach(aBleh -> System.out.println(aBleh));
+//        } while(true);
     }
 
 }

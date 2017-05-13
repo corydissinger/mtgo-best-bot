@@ -1,16 +1,24 @@
 package com.cd.bot.config;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Inbox;
+import akka.actor.Props;
+import com.cd.bot.akka.RobotActor;
 import com.cd.bot.robot.RobotWrapper;
 import com.cd.bot.system.ProcessManager;
 import com.cd.bot.tesseract.ImagePreProcessor;
 import com.cd.bot.tesseract.TesseractWrapper;
 import net.sourceforge.tess4j.TessAPI1;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.awt.*;
+
+import static com.cd.bot.akka.SpringExtension.SPRING_EXTENSION_PROVIDER;
 
 /**
  * Created by Cory on 5/11/2017.
@@ -26,6 +34,9 @@ public class BotConfig {
 
     @Autowired
     private Environment environment;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Bean
     public Robot robot() {
@@ -108,5 +119,29 @@ public class BotConfig {
     @Bean
     public Integer executableYOffset() {
         return Integer.parseInt(environment.getProperty("executable.y.offset"));
+    }
+
+    @Bean
+    public String robotActorConst() {
+        return "robotActor";
+    }
+
+    @Bean
+    public ActorSystem actorSystem() {
+        ActorSystem system = ActorSystem.create("LocalBotSystem");
+
+        SPRING_EXTENSION_PROVIDER.get(system).initialize(applicationContext);
+
+        return system;
+    }
+
+    @Bean
+    public ActorRef robotRef() {
+        return actorSystem().actorOf(SPRING_EXTENSION_PROVIDER.get(actorSystem()).props(robotActorConst()), robotActorConst());
+    }
+
+    @Bean
+    public Inbox inbox() {
+        return Inbox.create(actorSystem());
     }
 }

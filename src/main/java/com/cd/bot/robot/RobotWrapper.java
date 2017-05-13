@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
@@ -68,5 +69,21 @@ public class RobotWrapper {
         robot.mouseMove(xOff, yOff);
         robot.mousePress(event);
         robot.mouseRelease(event);
+    }
+
+    public void writeString(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isUpperCase(c)) {
+                robot.keyPress(KeyEvent.VK_SHIFT);
+            }
+            robot.keyPress(Character.toUpperCase(c));
+            robot.keyRelease(Character.toUpperCase(c));
+
+            if (Character.isUpperCase(c)) {
+                robot.keyRelease(KeyEvent.VK_SHIFT);
+            }
+        }
+        robot.delay(700);
     }
 }

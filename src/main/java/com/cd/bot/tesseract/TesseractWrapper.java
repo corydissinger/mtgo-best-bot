@@ -1,6 +1,7 @@
 package com.cd.bot.tesseract;
 
 import com.cd.bot.tesseract.model.RawLines;
+import com.cd.bot.tesseract.model.RawWord;
 import com.cd.bot.tesseract.model.TesseractRectangle;
 import com.sun.jna.Pointer;
 import net.sourceforge.tess4j.ITessAPI;
@@ -9,13 +10,14 @@ import net.sourceforge.tess4j.util.ImageIOHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Cory on 5/11/2017.
@@ -61,36 +63,50 @@ public class TesseractWrapper {
         TessAPI1.TessBaseAPIRecognize(tesseract, monitor);
 
         ITessAPI.TessResultIterator ri = TessAPI1.TessBaseAPIGetIterator(tesseract);
+        ITessAPI.TessPageIterator pi = TessAPI1.TessResultIteratorGetPageIterator(ri);
 
-        int level = ITessAPI.TessPageIteratorLevel.RIL_TEXTLINE;
+        int level = ITessAPI.TessPageIteratorLevel.RIL_WORD;
 
-        List<String> rawLines = new ArrayList<>();
-        List<Float> confidences = new ArrayList<>();
+        List<RawWord> currentLineWords = new ArrayList<>();
+        List<List<RawWord>> allLines = new ArrayList<>();
+        Integer lastTop = null;
 
         do {
-            Pointer symbol = TessAPI1.TessResultIteratorGetUTF8Text(ri, level);
+            final Pointer symbol = TessAPI1.TessResultIteratorGetUTF8Text(ri, level);
 
             if(symbol == null) {
                 continue;
             }
 
-            float conf = TessAPI1.TessResultIteratorConfidence(ri, level);
+            final String word = symbol.getString(0);
 
-            confidences.add(conf);
+            IntBuffer leftB = IntBuffer.allocate(1);
+            IntBuffer topB = IntBuffer.allocate(1);
+            IntBuffer rightB = IntBuffer.allocate(1);
+            IntBuffer bottomB = IntBuffer.allocate(1);
+            TessAPI1.TessPageIteratorBoundingBox(pi, level, leftB, topB, rightB, bottomB);
 
-            rawLines.add(symbol.getString(0));
+            final float conf = TessAPI1.TessResultIteratorConfidence(ri, level);
+
+            RawWord newWord = new RawWord(word, leftB.get(), topB.get(), rightB.get(), bottomB.get(), conf);
+
+            if(lastTop != null && !(lastTop - 2 < newWord.getTop() && lastTop + 2 > newWord.getTop())) {
+                allLines.add(currentLineWords.stream().map(oldWord -> new RawWord(oldWord)).collect(Collectors.toList()));
+                currentLineWords = new ArrayList<>();
+            }
+
+            currentLineWords.add(newWord);
+
+            lastTop = newWord.getTop();
         } while (TessAPI1.TessResultIteratorNext(ri, level) == ITessAPI.TRUE);
+
+        allLines.add(currentLineWords);
+
         Long endTime = System.currentTimeMillis();
 
-        System.out.println("Avg conf: " + confidences.stream().reduce(0f, (sum, next) -> sum + next) / confidences.size());
         System.out.println("Completed in " + (endTime - startTime) + " milliseconds");
 
-        RawLines rawLinesObj = new RawLines();
-
-        rawLinesObj.setRawLines(rawLines);
-        rawLinesObj.setConfidences(confidences);
-
-        return rawLinesObj;
+        return new RawLines(allLines);
     }
 
     public RawLines getRawText(BufferedImage bi) {

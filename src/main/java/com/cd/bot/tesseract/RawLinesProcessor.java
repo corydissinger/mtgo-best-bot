@@ -2,6 +2,7 @@ package com.cd.bot.tesseract;
 
 import com.cd.bot.robot.model.ProcessingLifecycleStatus;
 import com.cd.bot.tesseract.model.RawLines;
+import com.cd.bot.tesseract.model.RawWord;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
@@ -12,19 +13,27 @@ import java.util.List;
 public class RawLinesProcessor {
     public ProcessingLifecycleStatus determineLifecycleStatus(RawLines rawLines) {
         ProcessingLifecycleStatus status = ProcessingLifecycleStatus.UNKNOWN;
-        List<String> lines = rawLines.getRawLines();
+        List<List<RawWord>> lines = rawLines.getRawLines();
 
         if(CollectionUtils.isEmpty(lines)) {
             return status;
         }
 
-        for(String line : lines) {
-            if(line.contains("Forgot Password") || line.contains("LOG IN")) {
-                status = ProcessingLifecycleStatus.LOGIN_READY;
+        for(List<RawWord> line : lines) {
+            if(status != ProcessingLifecycleStatus.UNKNOWN) {
                 break;
-            } else if(line.contains("Welcome")) {
-                status = ProcessingLifecycleStatus.APPLICATION_READY;
-                break;
+            }
+
+            for(RawWord word : line) {
+                if(word.getWord().contains("Forgot") || word.getWord().contains("Password")) {
+                    status = ProcessingLifecycleStatus.LOGIN_READY;
+                    break;
+                } else if(word.getWord().contains("Welcome")) {
+                    status = ProcessingLifecycleStatus.APPLICATION_READY;
+                    break;
+                } else if(word.getWord().contains("Trade")) {
+                    status = ProcessingLifecycleStatus.TRADE_PARTNER;
+                }
             }
         }
 

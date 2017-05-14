@@ -5,6 +5,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Inbox;
 import akka.actor.Props;
 import com.cd.bot.akka.RobotActor;
+import com.cd.bot.akka.RobotActorMaster;
 import com.cd.bot.robot.RobotWrapper;
 import com.cd.bot.system.ProcessManager;
 import com.cd.bot.tesseract.ImagePreProcessor;
@@ -150,4 +151,10 @@ public class BotConfig {
     public RawLinesProcessor rawLinesProcessor() {
         return new RawLinesProcessor();
     }
+
+    @Bean
+    public RobotActorMaster robotActorMaster() {
+        return new RobotActorMaster();
+    }
+
 }

@@ -9,7 +9,9 @@ import com.cd.bot.tesseract.model.TesseractRectangle;
 public enum AssumedScreenTest {
     NOT_NEEDED(null),
     LOGIN(ScreenConstants.LOGIN_BOUNDS),
-    HOME_PAGE(ScreenConstants.WELCOME_BOUNDS);
+    HOME_PAGE(ScreenConstants.WELCOME_BOUNDS),
+    COLLECTION_BOUNDS(ScreenConstants.PARTNER_COLLECTION_LIST_BOUNDS),
+    TRADE(ScreenConstants.PARTNER_COLLECTION_LIST_BOUNDS);
 
     private final TesseractRectangle screenTestBounds;
 

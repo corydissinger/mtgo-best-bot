@@ -5,15 +5,13 @@
 	<groupId>com.cd.bot</groupId>
 	<artifactId>bot-standalone</artifactId>
 	<name>bot-standalone</name>
-	
+	<version>1.0.2</version>
+	<packaging>pom</packaging>
+
 	<parent>			
 		<groupId>com.cd.bot</groupId>
 		<artifactId>mtgo-best-bot</artifactId>
-		<version>${project.version}</version>
+		<version>1.0.2</version>
 	</parent>
-	
-	<packaging>pom</packaging>
-	
-	<version>${project.version}</version>
 
 </project>

@@ -4,19 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cd.bot</groupId>
 	<artifactId>bot-orchestrator</artifactId>
-	
+	<version>1.0.2</version>
 	<name>bot-orchestrator</name>
-	
+	<packaging>jar</packaging>
+
 	<parent>			
 		<groupId>com.cd.bot</groupId>
 		<artifactId>mtgo-best-bot</artifactId>
-		<version>${project.version}</version>
+		<version>1.0.2</version>
 	</parent>
 	
-	<packaging>jar</packaging>
-	
-	<version>${project.version}</version>
-
 	<dependencies>
 		<!-- Commons CSV -->
 		<dependency>
@@ -29,7 +26,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${org.springframework.version}</version>
 			<exclusions>
 				<!-- Exclude Commons Logging in favor of SLF4j -->
 				<exclusion>
@@ -42,40 +38,34 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>${org.springframework.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${org.springframework.version}</version>
 		</dependency>
 
 		<!-- AspectJ -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>${org.aspectj-version}</version>
 		</dependency>
 
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${org.slf4j-version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${org.slf4j-version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>${org.slf4j-version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -115,7 +105,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${org.springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
 

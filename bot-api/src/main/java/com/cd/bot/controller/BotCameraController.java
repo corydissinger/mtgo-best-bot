@@ -1,8 +1,11 @@
 package com.cd.bot.controller;
 
+import com.cd.bot.domain.Bot;
 import com.cd.bot.domain.BotCamera;
 import com.cd.bot.domain.BotCameraRepository;
+import com.cd.bot.domain.BotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,8 @@ import javax.print.attribute.standard.Media;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Cory on 5/15/2017.
@@ -22,12 +27,18 @@ public class BotCameraController {
     @Autowired
     private BotCameraRepository botCameraRepository;
 
-    @RequestMapping(value = "/botcamera", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, method = RequestMethod.POST)
-    public @ResponseBody BotCamera uploadCamera(@RequestPart MultipartFile file) throws IOException {
-        BotCamera botCam = new BotCamera(file.getBytes(), new Date());
+    @Autowired
+    private BotRepository botRepository;
 
-        botCameraRepository.save(botCam);
-        return botCam;
+    @RequestMapping(value = "/botcamera/{name}", method = RequestMethod.POST)
+    public @ResponseBody Long uploadCamera(@RequestPart MultipartFile file, @PathVariable final String name) throws IOException {
+        BotCamera botCam = new BotCamera(file.getBytes(), new Date());
+        Bot bot = botRepository.findByName(name);
+
+        botCam.setBot(bot);
+
+        botCam = botCameraRepository.save(botCam);
+        return botCam.getId();
     }
 
     @ResponseBody
@@ -36,5 +47,15 @@ public class BotCameraController {
         BotCamera botCam = botCameraRepository.findOne(Long.parseLong(id));
 
         return botCam.getScreenShot();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/botcamera/recent/{name}", method = RequestMethod.GET)
+    public List<Long> recent(@PathVariable final String name) {
+        Bot bot = botRepository.findByName(name);
+
+        List<Long> recent = botCameraRepository.findByBot(bot).stream().map(aBot -> aBot.getId()).collect(Collectors.toList());
+
+        return recent;
     }
 }

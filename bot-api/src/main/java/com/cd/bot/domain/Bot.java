@@ -1,5 +1,7 @@
 package com.cd.bot.domain;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -15,16 +17,17 @@ public class Bot {
     @Column(nullable = false)
     private String name;
 
+    @ApiModelProperty(hidden = true)
     @OneToMany(mappedBy = "bot")
     private List<BotStatus> botStatuses;
 
+    @ApiModelProperty(hidden = true)
     @OneToMany(mappedBy = "bot")
     private List<BotCamera> botCameras;
 
     protected Bot() { }
 
-    public Bot(Long id, String name) {
-        this.id = id;
+    public Bot(String name) {
         this.name = name;
     }
 

@@ -1,10 +1,7 @@
 package com.cd.bot.domain;
 
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by Cory on 5/15/2017.
@@ -13,19 +10,26 @@ import javax.persistence.Id;
 public class BotStatus {
 
     @Id
-    private String botName;
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="bot_id")
+    private Bot bot;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeTaken;
 
     @Column(nullable = false)
     private Integer lastKnownTicketsOnHand;
 
     protected BotStatus() {}
 
-    public BotStatus(String botName, Integer lastKnownTicketsOnHand) {
-        this.botName = botName;
+    public BotStatus(Long id, Bot bot, Integer lastKnownTicketsOnHand) {
+        this.id = id;
+        this.bot = bot;
         this.lastKnownTicketsOnHand = lastKnownTicketsOnHand;
     }
 
-    @ApiModelProperty(notes = "The last known amount of tickets for this bot", required = true)
     public Integer getLastKnownTicketsOnHand() {
         return lastKnownTicketsOnHand;
     }
@@ -34,12 +38,19 @@ public class BotStatus {
         this.lastKnownTicketsOnHand = lastKnownTicketsOnHand;
     }
 
-    @ApiModelProperty(notes = "The username of the bot", required = true)
-    public String getBotName() {
-        return botName;
+    public Bot getBot() {
+        return bot;
     }
 
-    public void setBotName(String botName) {
-        this.botName = botName;
+    public void setBot(Bot bot) {
+        this.bot = bot;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

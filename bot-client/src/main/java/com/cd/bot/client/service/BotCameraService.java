@@ -5,6 +5,7 @@ import com.cd.bot.api.controller.BotController;
 import com.cd.bot.api.domain.Bot;
 import com.cd.bot.api.domain.BotCamera;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -21,14 +22,19 @@ public class BotCameraService {
     private String botApiUrl;
 
     public Long saveBotCam(BotCamera botCamera) {
-        ResponseEntity<Long> idResponse = restTemplate.postForEntity(botApiUrl + BotCameraController.CAMERA_ROOT_URL, botCamera, Long.class);
+        HttpEntity<byte[]> byteEntity = new HttpEntity<>(botCamera.getScreenShot());
+        ResponseEntity<Long> idResponse = restTemplate.postForEntity(botApiUrl + BotCameraController.CAMERA_ROOT_URL + botCamera.getBot().getName(), byteEntity, Long.class);
 
         return idResponse.getBody();
     }
 
-    public Boolean registerOrLoadSelf(Bot bot) {
-        ResponseEntity<Void> resp = restTemplate.postForEntity(botApiUrl + BotController.BOT_ROOT_URL, bot, Void.class);
+    public Bot registerOrLoadSelf(Bot bot) {
+        ResponseEntity<Bot> resp = restTemplate.getForEntity(botApiUrl + BotController.BOT_ROOT_URL + "/name/" + bot.getName(), Bot.class);
 
-        return resp.getStatusCode() == HttpStatus.CREATED || resp.getStatusCode() == HttpStatus.FOUND;
+        if(resp.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Bot is not registered");
+        }
+
+        return resp.getBody();
     }
 }

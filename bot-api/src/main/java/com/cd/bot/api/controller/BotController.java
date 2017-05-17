@@ -36,6 +36,11 @@ public class BotController {
         return botRepository.findOne(Long.parseLong(id));
     }
 
+    @RequestMapping(value = BOT_ROOT_URL + "/name/{name}", method = RequestMethod.GET)
+    private Bot getByName(@PathVariable final String name) {
+        return botRepository.findByName(name);
+    }
+
     @RequestMapping(value = BOT_ROOT_URL, method = RequestMethod.POST)
     private ResponseEntity<Void> save(@RequestBody final Bot newBot) {
         botRepository.save(newBot);

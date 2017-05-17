@@ -2,11 +2,13 @@ package com.cd.bot.client.akka;
 
 import akka.actor.ActorRef;
 import akka.actor.Inbox;
+import com.cd.bot.api.domain.Bot;
 import com.cd.bot.client.robot.RobotWrapper;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
 import com.cd.bot.client.robot.model.AssumedScreenTest;
 import com.cd.bot.client.robot.model.ProcessingLifecycleStatus;
 import com.cd.bot.client.robot.mtgo.ScreenConstants;
+import com.cd.bot.client.service.BotCameraService;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
 import com.cd.bot.client.tesseract.model.RawLines;
@@ -40,7 +42,15 @@ public class RobotActorMaster {
     @Autowired
     private Inbox inbox;
 
+    @Autowired
+    private BotCameraService botCameraService;
+
+    @Autowired
+    private String botName;
+
     public void runBot() {
+        Bot remoteBot = botCameraService.registerOrLoadSelf(new Bot(botName));
+
         ProcessingLifecycleStatus status = ProcessingLifecycleStatus.UNKNOWN;
         AssumedScreenTest screenTest = AssumedScreenTest.NOT_NEEDED;
         boolean shouldProcessScreen = false;
@@ -97,7 +107,7 @@ public class RobotActorMaster {
 
             if(shouldProcessScreen) {
                 try {
-                    bi = robotWrapper.getCurrentScreen();
+                    bi = robotWrapper.getCurrentScreen(remoteBot);
 
                     if(status == ProcessingLifecycleStatus.UNKNOWN) {
                         if(screenTest == AssumedScreenTest.HOME_PAGE) {

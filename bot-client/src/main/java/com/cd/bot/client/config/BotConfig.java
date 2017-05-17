@@ -113,6 +113,11 @@ public class BotConfig {
     }
 
     @Bean
+    public String botName() {
+        return environment.getRequiredProperty("bot.name");
+    }
+
+    @Bean
     public Boolean executableShortcutOnly() {
         return Boolean.parseBoolean(environment.getProperty("executable.shortcut.only"));
     }

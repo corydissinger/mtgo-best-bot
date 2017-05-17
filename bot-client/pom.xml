@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.cd.bot</groupId>
+	<groupId>com.cd.bot.client</groupId>
 	<artifactId>bot-client</artifactId>
 	<name>bot-client</name>
 	<version>1.0.2</version>
@@ -13,10 +13,14 @@
 		<artifactId>mtgo-best-bot</artifactId>
 		<version>1.0.2</version>
 	</parent>
-	
-
 
 	<dependencies>
+		<dependency>
+			<groupId>com.cd.bot.api</groupId>
+			<artifactId>bot-api</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+
 		<!-- Commons CSV -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -215,9 +219,9 @@
 							<tasks>
 								<copy todir="${project.build.directory}/staging">
 									<fileset dir="${basedir}">
-										<include name="**/src/main/resources/*.properties"/>
-										<include name="**/src/main/resources/*.bat"/>
-										<include name="**/src/main/resources/*.md"/>
+										<include name="**/src/main/resources/bot-client/*.properties"/>
+										<include name="**/src/main/resources/bot-client/*.bat"/>
+										<include name="**/src/main/resources/bot-client/*.md"/>
 									</fileset>
 									<flattenmapper/>
 								</copy>
@@ -242,7 +246,7 @@
 						<configuration>
 							<archive>
 								<manifest>
-									<mainClass>com.cd.bot.Main</mainClass>
+									<mainClass>com.cd.bot.client.Main</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>

@@ -9,7 +9,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/staging</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/bot-client/</outputDirectory>
             <includes>
                 <include>application.properties</include>
                 <include>log4j.properties</include>

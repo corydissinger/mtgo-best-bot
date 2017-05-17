@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/integration"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:util="http://www.springframework.org/schema/util"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/util
+			http://www.springframework.org/schema/util/spring-util.xsd
+			http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    <gateway id="botGateway"
+             default-request-channel="botRequestsChannel"
+             service-interface="org.springframework.integration.samples.loanbroker.BotGateway">
+        <method name="getBestLoanQuote">
+            <header name="RESPONSE_TYPE" value="BEST"/>
+        </method>
+    </gateway>
+
+    <chain input-channel="botRequestsChannel">
+        <header-enricher>
+            <header name="creditScore" expression="@creditBureau.getCreditReport(payload).score"/>
+        </header-enricher>
+        <recipient-list-router apply-sequence="true">
+            <recipient selector-expression="headers.creditScore > 800" channel="exclusiveBankChannel"/>
+            <recipient selector-expression="headers.creditScore > 750" channel="premiereBankChannel"/>
+            <recipient selector-expression="headers.creditScore > 700" channel="qualityBankChannel"/>
+            <recipient selector-expression="headers.creditScore > 650" channel="friendlyBankChannel"/>
+            <recipient channel="easyBankChannel"/>
+        </recipient-list-router>
+    </chain>
+
+    <!-- Messages are sent to the banks via bank channels and will be received and processed by an aggregator -->
+
+    <aggregator input-channel="loanQuotesChannel" method="aggregateQuotes">
+        <beans:bean class="org.springframework.integration.samples.loanbroker.LoanQuoteAggregator"/>
+    </aggregator>
+
+</beans:beans>

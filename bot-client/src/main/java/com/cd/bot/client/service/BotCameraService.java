@@ -5,9 +5,12 @@ import com.cd.bot.api.controller.BotController;
 import com.cd.bot.api.domain.Bot;
 import com.cd.bot.api.domain.BotCamera;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -22,10 +25,22 @@ public class BotCameraService {
     private String botApiUrl;
 
     public Long saveBotCam(BotCamera botCamera) {
-        HttpEntity<byte[]> byteEntity = new HttpEntity<>(botCamera.getScreenShot());
-        ResponseEntity<Long> idResponse = restTemplate.postForEntity(botApiUrl + BotCameraController.CAMERA_ROOT_URL + botCamera.getBot().getName(), byteEntity, Long.class);
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+        ByteArrayResource contentsAsResource = new ByteArrayResource(botCamera.getScreenShot());
+        map.add("file", contentsAsResource);
+        HttpHeaders headers = new HttpHeaders();
 
-        return idResponse.getBody();
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
+
+        Long idResponse = -1l;
+
+        try {
+            idResponse = restTemplate.postForObject(botApiUrl + BotCameraController.CAMERA_ROOT_URL + botCamera.getBot().getName(), requestEntity, Long.class);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+
+        return idResponse;
     }
 
     public Bot registerOrLoadSelf(Bot bot) {

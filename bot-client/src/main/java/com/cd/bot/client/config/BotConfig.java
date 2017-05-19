@@ -9,6 +9,9 @@ import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
 import net.sourceforge.tess4j.TessAPI1;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,50 +160,14 @@ public class BotConfig {
     }
 
     @Bean
-    public RestTemplate cameraRestTemplate() {
-        RestTemplate cameraRestTemplate = new RestTemplate();
-        FormHttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
-        formHttpMessageConverter.setCharset(Charset.forName("UTF8"));
-
-        cameraRestTemplate.getMessageConverters().add( formHttpMessageConverter );
-        cameraRestTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        cameraRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
-        final String debug = environment.getProperty("debug");
-
-        if(Boolean.parseBoolean(debug)) {
-            ClientHttpRequestInterceptor ri = loggingHttpInterceptor();
-            List<ClientHttpRequestInterceptor> ris = new ArrayList<>();
-            ris.add(ri);
-            cameraRestTemplate.setInterceptors(ris);
-        }
-
-        return cameraRestTemplate;
-    }
-
-    @Bean
     public BotCameraService botCameraService() {
         return new BotCameraService();
     }
 
     @Bean
-    public ClientHttpRequestInterceptor loggingHttpInterceptor() {
-        //TODO - Replacing with lambda is a lie!
-        ClientHttpRequestInterceptor loggingHttpInterceptor = new ClientHttpRequestInterceptor () {
-            @Override
-            public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+    public HttpClient uploadHttpClient() {
+        HttpClient uploadHttpClient = HttpClientBuilder.create().build();
 
-                log.debug("Outbound request=" + request + System.lineSeparator() + "Outbound body=" + new String(body));
-                
-                ClientHttpResponse response = execution.execute(request, body);
-
-                log.debug("Inbound response=" + response + System.lineSeparator() + "Inbound body=" + new String(IOUtils.toString(response.getBody())));
-
-                return response;
-            }
-        };
-
-        return loggingHttpInterceptor;
+        return uploadHttpClient;
     }
-
 }

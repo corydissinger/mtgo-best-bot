@@ -4,22 +4,24 @@ import com.cd.bot.api.controller.BotCameraController;
 import com.cd.bot.api.controller.BotController;
 import com.cd.bot.api.domain.Bot;
 import com.cd.bot.api.domain.BotCamera;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by Cory on 5/16/2017.
@@ -32,27 +34,39 @@ public class BotCameraService {
     private RestTemplate restTemplate;
 
     @Autowired
-    private RestTemplate cameraRestTemplate;
-
-    @Autowired
     private String botApiUrl;
 
+    @Autowired
+    private HttpClient uploadHttpClient;
+
     public Long saveBotCam(BotCamera botCamera) {
-        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        ByteArrayResource contentsAsResource = new ByteArrayResource(botCamera.getScreenShot());
-        map.add("file", contentsAsResource);
+        HttpEntity entity = MultipartEntityBuilder
+                .create()
+                .addBinaryBody("file", botCamera.getScreenShot())
+                .build();
 
-        HttpHeaders imageHeaders = new HttpHeaders();
-        imageHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        HttpEntity<MultiValueMap<String, Object>> imageEntity = new HttpEntity<MultiValueMap<String, Object>>(map, imageHeaders);
-
-        Long idResponse = -1l;
+        Long idResponse = -1L;
 
         try {
-            ResponseEntity<Long> rawResp = cameraRestTemplate.exchange(botApiUrl + BotCameraController.CAMERA_ROOT_URL + botCamera.getBot().getName(), HttpMethod.POST, imageEntity, Long.class);
-            idResponse = rawResp.getBody();
-        } catch (RestClientException e) {
+            HttpPost httpPost = new HttpPost(botApiUrl + BotCameraController.CAMERA_ROOT_URL + "/" + botCamera.getBot().getName());
+            httpPost.setEntity(entity);
+            HttpResponse response = uploadHttpClient.execute(httpPost);
+            ResponseHandler<String> handler = new BasicResponseHandler();
+
+            if(response != null &&
+                response.getStatusLine() != null &&
+                response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+
+                final String rawResult = handler.handleResponse(response);
+
+                idResponse = Long.parseLong(rawResult);
+            } else {
+                log.error("Failed to upload pictar!");
+                log.error("Headers received: " + Arrays.stream(response.getAllHeaders()).map(header -> new String(header.getName() + ": " + header.getValue()))
+                                                                                        .reduce("", (result, next) -> System.lineSeparator() + next));
+                log.error("Body received: " + System.lineSeparator() + handler.handleResponse(response));
+            }
+        } catch (IOException e) {
             log.error("Failed to upload pictar!");
             log.error(e.getMessage());
         }

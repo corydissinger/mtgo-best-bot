@@ -56,20 +56,4 @@ public class BotApiApplication {
                 .build();
     }
 
-    @Bean
-    public MultipartConfigElement multipartConfigElement() {
-        int MAX_UPLOAD_SIZE = 10000000;
-
-        MultipartConfigElement multipartConfigElement = new MultipartConfigElement(environment.getRequiredProperty("upload.temp.folder"),
-                MAX_UPLOAD_SIZE, MAX_UPLOAD_SIZE * 2, MAX_UPLOAD_SIZE / 2);
-
-        return multipartConfigElement;
-    }
-
-    @Bean
-    public MultipartResolver multipartResolver() {
-        org.springframework.web.multipart.commons.CommonsMultipartResolver multipartResolver = new org.springframework.web.multipart.commons.CommonsMultipartResolver();
-        return multipartResolver;
-    }
-
 }

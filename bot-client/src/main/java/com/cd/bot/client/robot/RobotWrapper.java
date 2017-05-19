@@ -96,11 +96,11 @@ public class RobotWrapper {
 
         BufferedImage image = robot.createScreenCapture(new Rectangle(0, 0, screenWidth, screenHeight));
 
-//        try {
-//            botCameraService.saveBotCam(createBotCamera(image, remoteBot));
-//        } catch (IOException e) {
-//            throw new ApplicationDownException("Cannot communicate with API!");
-//        }
+        try {
+            botCameraService.saveBotCam(createBotCamera(image, remoteBot));
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot communicate with API!");
+        }
 
         return image;
     }

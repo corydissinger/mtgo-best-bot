@@ -10,6 +10,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class BotCameraService {
     public Long saveBotCam(BotCamera botCamera) {
         HttpEntity entity = MultipartEntityBuilder
                 .create()
-                .addBinaryBody("file", botCamera.getScreenShot())
+                .addPart("file", new ByteArrayBody(botCamera.getScreenShot(), "botSnapshot"))
                 .build();
 
         Long idResponse = -1L;

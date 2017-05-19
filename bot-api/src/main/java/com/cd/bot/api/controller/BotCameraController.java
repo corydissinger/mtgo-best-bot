@@ -33,7 +33,6 @@ public class BotCameraController {
     @Autowired
     private BotRepository botRepository;
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = CAMERA_ROOT_URL + "{name}", method = RequestMethod.POST)
     public @ResponseBody Long uploadCamera(@RequestParam("file") MultipartFile file, @PathVariable("name") final String name) throws IOException {
         BotCamera botCam = new BotCamera(file.getBytes(), new Date());

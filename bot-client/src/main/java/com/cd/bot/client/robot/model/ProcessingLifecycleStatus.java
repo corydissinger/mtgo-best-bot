@@ -8,6 +8,7 @@ public enum ProcessingLifecycleStatus {
     AWAIT_APPLICATION_READY,
     APPLICATION_READY,
     TRADE_PARTNER,
+    ACCEPT_TOS_EULA_READY,
     LOGIN_READY,
     LOGGING_IN,
     ABORT_LIFE

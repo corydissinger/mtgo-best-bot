@@ -1,5 +1,6 @@
 package com.cd.bot.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
@@ -9,6 +10,7 @@ import java.util.List;
  * Created by Cory on 5/16/2017.
  */
 @Entity
+@JsonIgnoreProperties({"botCameras", "botStatuses"})
 public class Bot {
     @Id
     @GeneratedValue

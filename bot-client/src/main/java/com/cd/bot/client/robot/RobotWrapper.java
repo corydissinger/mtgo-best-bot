@@ -20,6 +20,49 @@ import java.util.Date;
  * Created by Cory on 5/11/2017.
  */
 public class RobotWrapper {
+
+    static public class MouseClickEvent {
+        private int xOffset;
+        private int yOffset;
+        private boolean isDouble;
+
+        public int getxOffset() {
+            return xOffset;
+        }
+
+        public void setxOffset(int xOffset) {
+            this.xOffset = xOffset;
+        }
+
+        public int getyOffset() {
+            return yOffset;
+        }
+
+        public void setyOffset(int yOffset) {
+            this.yOffset = yOffset;
+        }
+
+        public boolean isDouble() {
+            return isDouble;
+        }
+
+        public void setDouble(boolean aDouble) {
+            isDouble = aDouble;
+        }
+    }
+
+    static public class InputStringEvent {
+        private String textToInput;
+
+        public String getTextToInput() {
+            return textToInput;
+        }
+
+        public void setTextToInput(String textToInput) {
+            this.textToInput = textToInput;
+        }
+    }
+
     @Autowired
     private Robot robot;
 
@@ -53,11 +96,11 @@ public class RobotWrapper {
 
         BufferedImage image = robot.createScreenCapture(new Rectangle(0, 0, screenWidth, screenHeight));
 
-        try {
-            botCameraService.saveBotCam(createBotCamera(image, remoteBot));
-        } catch (IOException e) {
-            throw new ApplicationDownException("Cannot communicate with API!");
-        }
+//        try {
+//            botCameraService.saveBotCam(createBotCamera(image, remoteBot));
+//        } catch (IOException e) {
+//            throw new ApplicationDownException("Cannot communicate with API!");
+//        }
 
         return image;
     }
@@ -81,6 +124,42 @@ public class RobotWrapper {
         }
 
         //Clean up any state we keep track of
+    }
+
+    public void clickAndDragVertical(int xOffOrig, int yOffOrig, int yOffEnd) {
+        final boolean isEndBelow = (yOffEnd > yOffOrig);
+        final int distance = isEndBelow ? yOffEnd - yOffOrig : yOffOrig - yOffEnd;
+
+        robot.mouseMove(xOffOrig, yOffOrig);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+
+        int intervalForScreen = isEndBelow ? 20 : -20;
+
+        for(int mouseMovePosition = yOffOrig;
+                    isEndBelow ? mouseMovePosition < yOffEnd : mouseMovePosition > yOffEnd;
+                    mouseMovePosition = getNextPosition(intervalForScreen, yOffEnd, mouseMovePosition)) {
+
+            robot.mouseMove(xOffOrig, mouseMovePosition);
+            robot.delay(20);
+        }
+
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+    }
+
+    private int getNextPosition(int intervalForScreen, int yOffEnd, int currentPosition) {
+        final int distanceLeft;
+
+        if (intervalForScreen > 0) { //down town
+            distanceLeft = yOffEnd - currentPosition;
+        } else { //Or up
+            distanceLeft = currentPosition - yOffEnd;
+        }
+
+        if(Math.abs(intervalForScreen) > distanceLeft) {
+            return yOffEnd;
+        } else {
+            return currentPosition + intervalForScreen;
+        }
     }
 
     public void singleClickAtLocation(int xOff, int yOff) {
@@ -115,7 +194,11 @@ public class RobotWrapper {
             if (Character.isUpperCase(c)) {
                 robot.keyRelease(KeyEvent.VK_SHIFT);
             }
+            robot.delay(700);
         }
-        robot.delay(700);
+    }
+
+    public void mouseWheel(int amount) {
+        robot.mouseWheel(amount);
     }
 }

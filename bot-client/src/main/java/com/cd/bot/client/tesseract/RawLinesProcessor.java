@@ -33,6 +33,8 @@ public class RawLinesProcessor {
                     break;
                 } else if(word.getWord().contains("Trade")) {
                     status = ProcessingLifecycleStatus.TRADE_PARTNER;
+                } else if(word.getWord().contains("SOFTWARE")) {
+                    status = ProcessingLifecycleStatus.ACCEPT_TOS_EULA_READY;
                 }
             }
         }

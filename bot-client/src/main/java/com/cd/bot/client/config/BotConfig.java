@@ -1,9 +1,6 @@
 package com.cd.bot.client.config;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Inbox;
-import com.cd.bot.client.akka.RobotActorMaster;
+import com.cd.bot.client.robot.RobotMaster;
 import com.cd.bot.client.service.BotCameraService;
 import com.cd.bot.client.robot.RobotWrapper;
 import com.cd.bot.client.system.ProcessManager;
@@ -11,18 +8,28 @@ import com.cd.bot.client.tesseract.ImagePreProcessor;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
 import net.sourceforge.tess4j.TessAPI1;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
 import java.awt.*;
-
-import static com.cd.bot.client.akka.SpringExtension.SPRING_EXTENSION_PROVIDER;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Cory on 5/11/2017.
@@ -32,6 +39,8 @@ import static com.cd.bot.client.akka.SpringExtension.SPRING_EXTENSION_PROVIDER;
 @ComponentScan({ "com.cd.bot.client" })
 @PropertySource(value = "file:${app.home}/bot-client/resources/application.properties")
 public class BotConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
 
     @Autowired
     private Environment environment;
@@ -133,37 +142,13 @@ public class BotConfig {
     }
 
     @Bean
-    public String robotActorConst() {
-        return "robotActor";
-    }
-
-    @Bean
-    public ActorSystem actorSystem() {
-        ActorSystem system = ActorSystem.create("LocalBotSystem");
-
-        SPRING_EXTENSION_PROVIDER.get(system).initialize(applicationContext);
-
-        return system;
-    }
-
-    @Bean
-    public ActorRef robotRef() {
-        return actorSystem().actorOf(SPRING_EXTENSION_PROVIDER.get(actorSystem()).props(robotActorConst()), robotActorConst());
-    }
-
-    @Bean
-    public Inbox inbox() {
-        return Inbox.create(actorSystem());
-    }
-
-    @Bean
     public RawLinesProcessor rawLinesProcessor() {
         return new RawLinesProcessor();
     }
 
     @Bean
-    public RobotActorMaster robotActorMaster() {
-        return new RobotActorMaster();
+    public RobotMaster robotActorMaster() {
+        return new RobotMaster();
     }
 
     @Bean
@@ -172,7 +157,50 @@ public class BotConfig {
     }
 
     @Bean
+    public RestTemplate cameraRestTemplate() {
+        RestTemplate cameraRestTemplate = new RestTemplate();
+        FormHttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
+        formHttpMessageConverter.setCharset(Charset.forName("UTF8"));
+
+        cameraRestTemplate.getMessageConverters().add( formHttpMessageConverter );
+        cameraRestTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        cameraRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
+        final String debug = environment.getProperty("debug");
+
+        if(Boolean.parseBoolean(debug)) {
+            ClientHttpRequestInterceptor ri = loggingHttpInterceptor();
+            List<ClientHttpRequestInterceptor> ris = new ArrayList<>();
+            ris.add(ri);
+            cameraRestTemplate.setInterceptors(ris);
+        }
+
+        return cameraRestTemplate;
+    }
+
+    @Bean
     public BotCameraService botCameraService() {
         return new BotCameraService();
     }
+
+    @Bean
+    public ClientHttpRequestInterceptor loggingHttpInterceptor() {
+        //TODO - Replacing with lambda is a lie!
+        ClientHttpRequestInterceptor loggingHttpInterceptor = new ClientHttpRequestInterceptor () {
+            @Override
+            public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+
+                log.debug("Outbound request=" + request + System.lineSeparator() + "Outbound body=" + new String(body));
+                
+                ClientHttpResponse response = execution.execute(request, body);
+
+                log.debug("Inbound response=" + response + System.lineSeparator() + "Inbound body=" + new String(IOUtils.toString(response.getBody())));
+
+                return response;
+            }
+        };
+
+        return loggingHttpInterceptor;
+    }
+
 }

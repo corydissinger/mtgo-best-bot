@@ -1,9 +1,6 @@
-package com.cd.bot.client.akka;
+package com.cd.bot.client.robot;
 
-import akka.actor.ActorRef;
-import akka.actor.Inbox;
 import com.cd.bot.api.domain.Bot;
-import com.cd.bot.client.robot.RobotWrapper;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
 import com.cd.bot.client.robot.model.AssumedScreenTest;
 import com.cd.bot.client.robot.model.ProcessingLifecycleStatus;
@@ -14,18 +11,15 @@ import com.cd.bot.client.tesseract.TesseractWrapper;
 import com.cd.bot.client.tesseract.model.RawLines;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import scala.concurrent.duration.Duration;
 
 import java.awt.image.BufferedImage;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Created by Cory on 5/13/2017.
  */
-public class RobotActorMaster {
+public class RobotMaster {
 
-    private static final Logger logger = Logger.getLogger(RobotActorMaster.class);
+    private static final Logger logger = Logger.getLogger(RobotMaster.class);
 
     @Autowired
     private TesseractWrapper tesseractWrapper;
@@ -35,12 +29,6 @@ public class RobotActorMaster {
 
     @Autowired
     private RawLinesProcessor rawLinesProcessor;
-
-    @Autowired
-    private ActorRef robotRef;
-
-    @Autowired
-    private Inbox inbox;
 
     @Autowired
     private BotCameraService botCameraService;
@@ -56,49 +44,39 @@ public class RobotActorMaster {
         boolean shouldProcessScreen = false;
 
         do {
+            logger.info("Current state is: " + status.name());
+
             BufferedImage bi = null;
             int sleepTime = 500;
 
             switch(status) {
                 case APPLICATION_READY:
-                    logger.info("Current state: APPLICATION_READY");
                     screenTest = AssumedScreenTest.COLLECTION_BOUNDS; //do some shits
                     shouldProcessScreen = true;
                     break;
                 case TRADE_PARTNER:
-                    logger.info("Current state: TRADE_PARTNER");
                     screenTest = AssumedScreenTest.TRADE; //do some shits
                     shouldProcessScreen = true;
                     break;
                 case UNKNOWN:
-                    logger.info("Current state: UNKNOWN");
                     shouldProcessScreen = true;
                     break;
+                case ACCEPT_TOS_EULA_READY:
+                    final int yOffEnd = ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop() + 400;
+
+                    robotWrapper.clickAndDragVertical(ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getLeft(),
+                                                      ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop(),
+                                                      yOffEnd);
+
+                    robotWrapper.doubleClickAtLocation(1115, 755);
+
+                    status = ProcessingLifecycleStatus.UNKNOWN;
+
+                    break;
                 case LOGIN_READY:
-                    logger.info("Current state: LOGIN_READY");
-                    RobotActor.InputStringEvent e = new RobotActor.InputStringEvent();
-
-                    e.setTextToInput("Nova4545");
-
-                    inbox.send(robotRef, e);
-
-                    try {
-                        RobotActor.EventSuccessEvent resp = (RobotActor.EventSuccessEvent) inbox.receive(Duration.create(5, TimeUnit.SECONDS));
-
-                        if(resp != null) {
-                            RobotActor.MouseClickEvent me = new RobotActor.MouseClickEvent();
-
-                            me.setDouble(true);
-                            me.setxOffset(ScreenConstants.LOGIN_BUTTON_CENTER.getLeft());
-                            me.setyOffset(ScreenConstants.LOGIN_BUTTON_CENTER.getTop());
-
-                            inbox.send(robotRef, me);
-
-                            RobotActor.ApplicationServerResponseAwaitEvent clickResp = (RobotActor.ApplicationServerResponseAwaitEvent) inbox.receive(Duration.create(5, TimeUnit.SECONDS));
-                        }
-                    } catch (TimeoutException e1) {
-                        e1.printStackTrace();
-                    }
+                    robotWrapper.singleClickAtLocation(1235, 440);
+                    robotWrapper.writeString("Nova4545");
+                    robotWrapper.doubleClickAtLocation(ScreenConstants.LOGIN_BUTTON_CENTER.getLeft(), ScreenConstants.LOGIN_BUTTON_CENTER.getTop());
 
                     status = ProcessingLifecycleStatus.UNKNOWN;
                     sleepTime = 20000;
@@ -109,11 +87,14 @@ public class RobotActorMaster {
                 try {
                     bi = robotWrapper.getCurrentScreen(remoteBot);
 
+                    //TODO - MULTI SCREEN STATE TEST BOIY
                     if(status == ProcessingLifecycleStatus.UNKNOWN) {
-                        if(screenTest == AssumedScreenTest.HOME_PAGE) {
+                        if(screenTest == AssumedScreenTest.EULA) {
+                            screenTest = AssumedScreenTest.HOME_PAGE;
+                        } if(screenTest == AssumedScreenTest.HOME_PAGE) {
                             screenTest = AssumedScreenTest.LOGIN;
                         } else {
-                            screenTest = AssumedScreenTest.HOME_PAGE;
+                            screenTest = AssumedScreenTest.EULA;
                         }
                     }
                 } catch (ApplicationDownException e) {

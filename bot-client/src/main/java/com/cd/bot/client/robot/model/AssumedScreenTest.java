@@ -11,7 +11,8 @@ public enum AssumedScreenTest {
     LOGIN(ScreenConstants.LOGIN_BOUNDS),
     HOME_PAGE(ScreenConstants.WELCOME_BOUNDS),
     COLLECTION_BOUNDS(ScreenConstants.PARTNER_COLLECTION_LIST_BOUNDS),
-    TRADE(ScreenConstants.PARTNER_COLLECTION_LIST_BOUNDS);
+    TRADE(ScreenConstants.PARTNER_COLLECTION_LIST_BOUNDS),
+    EULA(ScreenConstants.ACCEPT_TOS_BOUNDS);
 
     private final TesseractRectangle screenTestBounds;
 

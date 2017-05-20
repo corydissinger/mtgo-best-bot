@@ -1,6 +1,6 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.BotCamera;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
 import com.cd.bot.client.service.BotCameraService;
@@ -89,7 +89,7 @@ public class RobotWrapper {
 
     //private ScreenModel
 
-    public BufferedImage getCurrentScreen(Bot remoteBot) throws ApplicationDownException {
+    public BufferedImage getCurrentScreen(PlayerBot remotePlayerBot) throws ApplicationDownException {
         if(!processManager.isMtgoRunningOrLoading()) {
             throw new ApplicationDownException("MTGO is not running!");
         }
@@ -97,7 +97,7 @@ public class RobotWrapper {
         BufferedImage image = robot.createScreenCapture(new Rectangle(0, 0, screenWidth, screenHeight));
 
         try {
-            botCameraService.saveBotCam(createBotCamera(image, remoteBot));
+            botCameraService.saveBotCam(createBotCamera(image, remotePlayerBot));
         } catch (IOException e) {
             throw new RuntimeException("Cannot communicate with API!");
         }
@@ -105,14 +105,14 @@ public class RobotWrapper {
         return image;
     }
 
-    private BotCamera createBotCamera(BufferedImage image, Bot remoteBot) throws IOException {
+    private BotCamera createBotCamera(BufferedImage image, PlayerBot remotePlayerBot) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "jpg", baos );
         baos.flush();
         byte[] imageInByte = baos.toByteArray();
 
         BotCamera botCamera = new BotCamera(imageInByte, new Date());
-        botCamera.setBot(remoteBot);
+        botCamera.setPlayerBot(remotePlayerBot);
         return botCamera;
     }
 

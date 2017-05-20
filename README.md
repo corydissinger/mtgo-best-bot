@@ -1,2 +1,2 @@
-# mtgo-best-bot
-mtgo-best-bot
+# mtgo-best-playerBot
+mtgo-best-playerBot

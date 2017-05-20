@@ -1,9 +1,9 @@
 package com.cd.bot.api.controller;
 
-import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.BotCamera;
-import com.cd.bot.model.domain.BotCameraRepository;
-import com.cd.bot.model.domain.BotRepository;
+import com.cd.bot.model.domain.repository.BotCameraRepository;
+import com.cd.bot.model.domain.repository.PlayerBotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -28,14 +28,14 @@ public class BotCameraController {
     private BotCameraRepository botCameraRepository;
 
     @Autowired
-    private BotRepository botRepository;
+    private PlayerBotRepository playerBotRepository;
 
     @RequestMapping(value = CAMERA_ROOT_URL + "/{name}", method = RequestMethod.POST)
     public @ResponseBody Long uploadCamera(@RequestParam("file") MultipartFile file, @PathVariable("name") final String name) throws IOException {
         BotCamera botCam = new BotCamera(file.getBytes(), new Date());
-        Bot bot = botRepository.findByName(name);
+        PlayerBot playerBot = playerBotRepository.findByName(name);
 
-        botCam.setBot(bot);
+        botCam.setPlayerBot(playerBot);
 
         botCam = botCameraRepository.save(botCam);
         return botCam.getId();
@@ -52,9 +52,9 @@ public class BotCameraController {
     @ResponseBody
     @RequestMapping(value = CAMERA_ROOT_URL + "/name/{name}", method = RequestMethod.GET)
     public List<Long> recent(@PathVariable final String name) {
-        Bot bot = botRepository.findByName(name);
+        PlayerBot playerBot = playerBotRepository.findByName(name);
 
-        List<Long> recent = botCameraRepository.findByBot(bot).stream().map(aBot -> aBot.getId()).collect(Collectors.toList());
+        List<Long> recent = botCameraRepository.findByPlayerBot(playerBot).stream().map(aBot -> aBot.getId()).collect(Collectors.toList());
 
         return recent;
     }

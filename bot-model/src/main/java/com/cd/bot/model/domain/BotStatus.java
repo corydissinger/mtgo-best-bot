@@ -14,7 +14,7 @@ public class BotStatus {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="bot_id")
-    private Bot bot;
+    private PlayerBot playerBot;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeTaken;
@@ -24,9 +24,9 @@ public class BotStatus {
 
     protected BotStatus() {}
 
-    public BotStatus(Long id, Bot bot, Integer lastKnownTicketsOnHand) {
+    public BotStatus(Long id, PlayerBot playerBot, Integer lastKnownTicketsOnHand) {
         this.id = id;
-        this.bot = bot;
+        this.playerBot = playerBot;
         this.lastKnownTicketsOnHand = lastKnownTicketsOnHand;
     }
 
@@ -38,12 +38,12 @@ public class BotStatus {
         this.lastKnownTicketsOnHand = lastKnownTicketsOnHand;
     }
 
-    public Bot getBot() {
-        return bot;
+    public PlayerBot getPlayerBot() {
+        return playerBot;
     }
 
-    public void setBot(Bot bot) {
-        this.bot = bot;
+    public void setPlayerBot(PlayerBot playerBot) {
+        this.playerBot = playerBot;
     }
 
     public Long getId() {

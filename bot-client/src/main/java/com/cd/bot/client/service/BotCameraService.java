@@ -2,7 +2,7 @@ package com.cd.bot.client.service;
 
 import com.cd.bot.api.controller.BotCameraController;
 import com.cd.bot.api.controller.BotController;
-import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.BotCamera;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -48,7 +48,7 @@ public class BotCameraService {
         Long idResponse = -1L;
 
         try {
-            HttpPost httpPost = new HttpPost(botApiUrl + BotCameraController.CAMERA_ROOT_URL + "/" + botCamera.getBot().getName());
+            HttpPost httpPost = new HttpPost(botApiUrl + BotCameraController.CAMERA_ROOT_URL + "/" + botCamera.getPlayerBot().getName());
             httpPost.setEntity(entity);
             HttpResponse response = uploadHttpClient.execute(httpPost);
             ResponseHandler<String> handler = new BasicResponseHandler();
@@ -74,11 +74,11 @@ public class BotCameraService {
         return idResponse;
     }
 
-    public Bot registerOrLoadSelf(Bot bot) {
-        ResponseEntity<Bot> resp;
+    public PlayerBot registerOrLoadSelf(PlayerBot playerBot) {
+        ResponseEntity<PlayerBot> resp;
 
         try {
-            resp = restTemplate.getForEntity(botApiUrl + BotController.BOT_ROOT_URL + "/name/" + bot.getName(), Bot.class);
+            resp = restTemplate.getForEntity(botApiUrl + BotController.BOT_ROOT_URL + "/name/" + playerBot.getName(), PlayerBot.class);
         } catch (RestClientException e) {
             log.error("Failed to log in!");
             log.error(e.getMessage());
@@ -87,7 +87,7 @@ public class BotCameraService {
 
 
         if(resp.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Bot is not registered");
+            throw new RuntimeException("PlayerBot is not registered");
         }
 
         return resp.getBody();

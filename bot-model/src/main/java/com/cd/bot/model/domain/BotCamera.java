@@ -14,7 +14,7 @@ public class BotCamera {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="bot_id")
-    private Bot bot;
+    private PlayerBot playerBot;
 
     @Lob
     @Column( name = "SCREEN_SHOT" )
@@ -54,11 +54,11 @@ public class BotCamera {
         this.id = id;
     }
 
-    public Bot getBot() {
-        return bot;
+    public PlayerBot getPlayerBot() {
+        return playerBot;
     }
 
-    public void setBot(Bot bot) {
-        this.bot = bot;
+    public void setPlayerBot(PlayerBot playerBot) {
+        this.playerBot = playerBot;
     }
 }

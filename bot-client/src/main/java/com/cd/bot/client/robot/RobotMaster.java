@@ -1,6 +1,6 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
 import com.cd.bot.client.robot.model.AssumedScreenTest;
 import com.cd.bot.client.robot.model.ProcessingLifecycleStatus;
@@ -37,7 +37,7 @@ public class RobotMaster {
     private String botName;
 
     public void runBot() {
-        Bot remoteBot = botCameraService.registerOrLoadSelf(new Bot(botName));
+        PlayerBot remotePlayerBot = botCameraService.registerOrLoadSelf(new PlayerBot(botName));
 
         ProcessingLifecycleStatus status = ProcessingLifecycleStatus.UNKNOWN;
         AssumedScreenTest screenTest = AssumedScreenTest.NOT_NEEDED;
@@ -85,7 +85,7 @@ public class RobotMaster {
 
             if(shouldProcessScreen) {
                 try {
-                    bi = robotWrapper.getCurrentScreen(remoteBot);
+                    bi = robotWrapper.getCurrentScreen(remotePlayerBot);
 
                     //TODO - MULTI SCREEN STATE TEST BOIY
                     if(status == ProcessingLifecycleStatus.UNKNOWN) {

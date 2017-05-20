@@ -9,7 +9,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/staging</directory>
-            <outputDirectory>/bot-client/</outputDirectory>
+            <outputDirectory>/playerBot-client/</outputDirectory>
             <includes>
                 <include>application.properties</include>
                 <include>log4j.properties</include>
@@ -21,7 +21,7 @@
             <directory>${project.build.directory}</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>bot-client-jar-with-dependencies.jar</include>
+                <include>playerBot-client-jar-with-dependencies.jar</include>
             </includes>
         </fileSet>
     </fileSets>

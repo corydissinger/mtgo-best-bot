@@ -1,4 +1,4 @@
-package com.cd.bot.client.service;
+package com.cd.bot.wrapper.http;
 
 import com.cd.bot.api.controller.BotCameraController;
 import com.cd.bot.api.controller.BotController;

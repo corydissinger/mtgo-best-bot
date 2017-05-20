@@ -1,14 +1,14 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
 import com.cd.bot.client.robot.model.AssumedScreenTest;
 import com.cd.bot.client.robot.model.ProcessingLifecycleStatus;
 import com.cd.bot.client.robot.mtgo.ScreenConstants;
-import com.cd.bot.client.service.BotCameraService;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
 import com.cd.bot.client.tesseract.model.RawLines;
+import com.cd.bot.model.domain.PlayerBot;
+import com.cd.bot.wrapper.http.BotCameraService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 

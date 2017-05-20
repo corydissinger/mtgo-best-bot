@@ -3,8 +3,8 @@ package com.cd.bot.client.robot;
 import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.BotCamera;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
-import com.cd.bot.client.service.BotCameraService;
 import com.cd.bot.client.system.ProcessManager;
+import com.cd.bot.wrapper.http.BotCameraService;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 

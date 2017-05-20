@@ -53,11 +53,6 @@
 			<artifactId>bot-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.cd.bot.model</groupId>
-			<artifactId>bot-model</artifactId>
-			<version>1.0.2</version>
-		</dependency>
 	</dependencies>
 
 	<properties>

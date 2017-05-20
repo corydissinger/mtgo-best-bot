@@ -121,7 +121,7 @@ public class BotConfig {
 
     @Bean
     public String botApiUrl() {
-        return environment.getRequiredProperty("bot.api.url");
+        return environment.getRequiredProperty("bot.model.url");
     }
 
     @Bean

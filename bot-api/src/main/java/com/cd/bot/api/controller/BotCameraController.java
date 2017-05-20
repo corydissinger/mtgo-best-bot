@@ -1,9 +1,9 @@
 package com.cd.bot.api.controller;
 
-import com.cd.bot.api.domain.Bot;
-import com.cd.bot.api.domain.BotCamera;
-import com.cd.bot.api.domain.BotCameraRepository;
-import com.cd.bot.api.domain.BotRepository;
+import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.BotCamera;
+import com.cd.bot.model.domain.BotCameraRepository;
+import com.cd.bot.model.domain.BotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;

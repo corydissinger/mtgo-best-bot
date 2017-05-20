@@ -1,9 +1,9 @@
 package com.cd.bot.api.controller;
 
-import com.cd.bot.api.domain.Bot;
-import com.cd.bot.api.domain.BotRepository;
-import com.cd.bot.api.domain.BotStatus;
-import com.cd.bot.api.domain.BotStatusRepository;
+import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.BotRepository;
+import com.cd.bot.model.domain.BotStatus;
+import com.cd.bot.model.domain.BotStatusRepository;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

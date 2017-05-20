@@ -1,4 +1,4 @@
-package com.cd.bot.api.domain;
+package com.cd.bot.model.domain;
 
 import javax.persistence.*;
 import java.util.Date;

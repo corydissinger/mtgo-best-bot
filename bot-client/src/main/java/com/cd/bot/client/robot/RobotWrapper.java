@@ -1,7 +1,7 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.api.domain.Bot;
-import com.cd.bot.api.domain.BotCamera;
+import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.BotCamera;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
 import com.cd.bot.client.service.BotCameraService;
 import com.cd.bot.client.system.ProcessManager;

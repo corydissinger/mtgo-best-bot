@@ -6,6 +6,7 @@ import com.cd.bot.api.controller.BotCameraController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -28,7 +29,8 @@ import javax.servlet.MultipartConfigElement;
  */
 @SpringBootApplication
 @EnableSwagger2
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
+@EntityScan(basePackages = {"com.cd.bot.model.domain"} )
 @ComponentScan(basePackageClasses = {BotController.class, BotStatusController.class, BotCameraController.class})
 public class BotApiApplication {
     public static void main(String[] args) {

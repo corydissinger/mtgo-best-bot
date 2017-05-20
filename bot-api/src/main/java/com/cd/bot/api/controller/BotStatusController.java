@@ -1,7 +1,7 @@
 package com.cd.bot.api.controller;
 
-import com.cd.bot.api.domain.BotStatus;
-import com.cd.bot.api.domain.BotStatusRepository;
+import com.cd.bot.model.domain.BotStatus;
+import com.cd.bot.model.domain.BotStatusRepository;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

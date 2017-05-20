@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>com.cd.bot.api</groupId>
 			<artifactId>bot-api</artifactId>
-			<version>1.0.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<!-- Commons CSV -->

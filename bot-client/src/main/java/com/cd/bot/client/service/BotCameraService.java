@@ -2,8 +2,8 @@ package com.cd.bot.client.service;
 
 import com.cd.bot.api.controller.BotCameraController;
 import com.cd.bot.api.controller.BotController;
-import com.cd.bot.api.domain.Bot;
-import com.cd.bot.api.domain.BotCamera;
+import com.cd.bot.model.domain.Bot;
+import com.cd.bot.model.domain.BotCamera;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -15,7 +15,6 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;

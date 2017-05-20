@@ -1,6 +1,6 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.api.domain.Bot;
+import com.cd.bot.model.domain.Bot;
 import com.cd.bot.client.robot.exception.ApplicationDownException;
 import com.cd.bot.client.robot.model.AssumedScreenTest;
 import com.cd.bot.client.robot.model.ProcessingLifecycleStatus;

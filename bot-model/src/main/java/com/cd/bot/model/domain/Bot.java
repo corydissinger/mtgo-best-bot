@@ -1,4 +1,4 @@
-package com.cd.bot.api.domain;
+package com.cd.bot.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;

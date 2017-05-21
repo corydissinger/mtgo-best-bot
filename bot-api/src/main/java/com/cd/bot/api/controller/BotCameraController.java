@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class BotCameraController {
 
     public static final String BOT_CAMERA_RECENT = "/botcamera/recent/{name}";
-    public static final String CAMERA_ROOT_URL = "/botcamera";
+    public static final String ENDPOINT_ROINT = "/botcamera";
 
     @Autowired
     private BotCameraRepository botCameraRepository;
@@ -30,7 +30,7 @@ public class BotCameraController {
     @Autowired
     private PlayerBotRepository playerBotRepository;
 
-    @RequestMapping(value = CAMERA_ROOT_URL + "/{name}", method = RequestMethod.POST)
+    @RequestMapping(value = ENDPOINT_ROINT + "/{name}", method = RequestMethod.POST)
     public @ResponseBody Long uploadCamera(@RequestParam("file") MultipartFile file, @PathVariable("name") final String name) throws IOException {
         BotCamera botCam = new BotCamera(file.getBytes(), new Date());
         PlayerBot playerBot = playerBotRepository.findByName(name);
@@ -42,7 +42,7 @@ public class BotCameraController {
     }
 
     @ResponseBody
-    @RequestMapping(value = CAMERA_ROOT_URL + "/id/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    @RequestMapping(value = ENDPOINT_ROINT + "/id/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getCam(@PathVariable final Long id) {
         BotCamera botCam = botCameraRepository.findOne(id);
 
@@ -50,7 +50,7 @@ public class BotCameraController {
     }
 
     @ResponseBody
-    @RequestMapping(value = CAMERA_ROOT_URL + "/name/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = ENDPOINT_ROINT + "/name/{name}", method = RequestMethod.GET)
     public List<Long> recent(@PathVariable final String name) {
         PlayerBot playerBot = playerBotRepository.findByName(name);
 

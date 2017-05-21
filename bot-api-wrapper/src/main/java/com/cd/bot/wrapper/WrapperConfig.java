@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({ "com.cd.bot.wrapper" })
-@PropertySource(value = "file:${app.home}/resources/application.properties")
+@PropertySource(value = "classpath:wrapper-application.properties")
 public class WrapperConfig {
 
     @Bean

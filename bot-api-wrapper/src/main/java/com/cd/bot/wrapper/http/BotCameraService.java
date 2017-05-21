@@ -48,7 +48,7 @@ public class BotCameraService {
         Long idResponse = -1L;
 
         try {
-            HttpPost httpPost = new HttpPost(botApiUrl + BotCameraController.CAMERA_ROOT_URL + "/" + botCamera.getPlayerBot().getName());
+            HttpPost httpPost = new HttpPost(botApiUrl + BotCameraController.ENDPOINT_ROINT + "/" + botCamera.getPlayerBot().getName());
             httpPost.setEntity(entity);
             HttpResponse response = uploadHttpClient.execute(httpPost);
             ResponseHandler<String> handler = new BasicResponseHandler();
@@ -78,7 +78,7 @@ public class BotCameraService {
         ResponseEntity<PlayerBot> resp;
 
         try {
-            resp = restTemplate.getForEntity(botApiUrl + BotController.BOT_ROOT_URL + "/name/" + playerBot.getName(), PlayerBot.class);
+            resp = restTemplate.getForEntity(botApiUrl + BotController.ENDPOINT_ROOT + "/name/" + playerBot.getName(), PlayerBot.class);
         } catch (RestClientException e) {
             log.error("Failed to log in!");
             log.error(e.getMessage());

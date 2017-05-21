@@ -23,7 +23,7 @@ import java.awt.*;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({ "com.cd.bot.client", "comd.cd.bot.wrapper" })
-@PropertySource(value = "file:${app.home}/bot-client/resources/application.properties")
+@PropertySource(value = "classpath:client-application.properties")
 public class BotConfig {
 
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);

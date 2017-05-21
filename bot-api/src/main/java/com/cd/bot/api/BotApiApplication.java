@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.multipart.MultipartResolver;
@@ -32,6 +33,7 @@ import javax.servlet.MultipartConfigElement;
 @EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
 @EntityScan(basePackages = {"com.cd.bot.model.domain"} )
 @ComponentScan(basePackageClasses = {BotController.class, BotStatusController.class, BotCameraController.class})
+@PropertySource(value = "classpath:api-application.properties")
 public class BotApiApplication {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(BotApiApplication.class, args);

@@ -8,6 +8,7 @@ import javax.persistence.*;
  * Created by Cory on 5/20/2017.
  */
 @Entity
+@JsonIgnoreProperties("playerBot")
 public class OwnedTradeableCard extends TradeableCard {
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -14,8 +14,8 @@ public abstract class TradeableCard {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="card_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="card_name")
     private Card card;
 
     public Double getPrice() {

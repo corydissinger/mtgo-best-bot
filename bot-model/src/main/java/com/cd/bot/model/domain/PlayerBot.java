@@ -24,6 +24,10 @@ public class PlayerBot extends Bot {
     @OneToMany(mappedBy = "playerBot")
     private List<OwnedTradeableCard> botCards;
 
+    @ApiModelProperty(hidden = true)
+    @OneToMany(mappedBy = "playerBot")
+    private List<ExecutedTrade> executedTrades;
+
     protected PlayerBot() { }
 
     public PlayerBot(String name) {
@@ -68,5 +72,13 @@ public class PlayerBot extends Bot {
 
     public void setBotCards(List<OwnedTradeableCard> botCards) {
         this.botCards = botCards;
+    }
+
+    public List<ExecutedTrade> getExecutedTrades() {
+        return executedTrades;
+    }
+
+    public void setExecutedTrades(List<ExecutedTrade> executedTrades) {
+        this.executedTrades = executedTrades;
     }
 }

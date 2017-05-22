@@ -10,5 +10,4 @@ import org.springframework.stereotype.Repository;
  * Created by Cory on 5/15/2017.
  */
 @Repository
-public interface BotStatusRepository extends JpaRepository<BotStatus, String> {
-}
+public interface BotStatusRepository extends JpaRepository<BotStatus, String> { }

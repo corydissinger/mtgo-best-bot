@@ -32,7 +32,7 @@ import javax.servlet.MultipartConfigElement;
 @EnableSwagger2
 @EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
 @EntityScan(basePackages = {"com.cd.bot.model.domain"} )
-@ComponentScan(basePackageClasses = {BotController.class, BotStatusController.class, BotCameraController.class})
+@ComponentScan(basePackages = {"com.cd.bot.api"} )
 @PropertySource(value = "classpath:api-application.properties")
 public class BotApiApplication {
     public static void main(String[] args) {

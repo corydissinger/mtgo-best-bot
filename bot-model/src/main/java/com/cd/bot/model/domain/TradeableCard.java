@@ -1,22 +1,26 @@
 package com.cd.bot.model.domain;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by Cory on 5/20/2017.
  */
 @MappedSuperclass
 public abstract class TradeableCard {
-    private Double price;
-    private Integer quantity;
+    protected Double price;
+    protected Integer quantity;
 
     @Id
     @GeneratedValue
-    private Long id;
+    protected Long id;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date asOf;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="card_name")
-    private Card card;
+    protected Card card;
 
     public Double getPrice() {
         return price;
@@ -48,5 +52,13 @@ public abstract class TradeableCard {
 
     public void setCard(Card card) {
         this.card = card;
+    }
+
+    public Date getAsOf() {
+        return asOf;
+    }
+
+    public void setAsOf(Date asOf) {
+        this.asOf = asOf;
     }
 }

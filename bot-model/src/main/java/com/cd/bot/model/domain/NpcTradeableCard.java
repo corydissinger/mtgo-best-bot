@@ -10,6 +10,8 @@ import javax.persistence.*;
 @Entity
 public class NpcTradeableCard extends TradeableCard {
 
+    protected NpcTradeableCard() {}
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="bot_id")
     private NpcBot npcBot;

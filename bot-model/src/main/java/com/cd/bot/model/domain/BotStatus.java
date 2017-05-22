@@ -16,11 +16,11 @@ public class BotStatus {
     @JoinColumn(name="bot_id")
     private PlayerBot playerBot;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timeTaken;
-
     @Column(nullable = false)
     private Integer lastKnownTicketsOnHand;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastCommunication;
 
     protected BotStatus() {}
 
@@ -52,5 +52,13 @@ public class BotStatus {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Date getLastCommunication() {
+        return lastCommunication;
+    }
+
+    public void setLastCommunication(Date lastCommunication) {
+        this.lastCommunication = lastCommunication;
     }
 }

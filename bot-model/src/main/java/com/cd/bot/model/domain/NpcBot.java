@@ -16,6 +16,9 @@ public class NpcBot extends Bot {
     @OneToMany(mappedBy = "npcBot")
     private List<NpcTradeableCard> npcTradeableCards;
 
+    @OneToMany(mappedBy = "npcBot")
+    private List<ExecutedTrade> executedTrades;
+
     protected NpcBot() {}
 
     public NpcBot(String name) {
@@ -30,4 +33,11 @@ public class NpcBot extends Bot {
         this.npcTradeableCards = npcTradeableCards;
     }
 
+    public List<ExecutedTrade> getExecutedTrades() {
+        return executedTrades;
+    }
+
+    public void setExecutedTrades(List<ExecutedTrade> executedTrades) {
+        this.executedTrades = executedTrades;
+    }
 }

@@ -15,11 +15,23 @@ public class OwnedTradeableCard extends TradeableCard {
     @JoinColumn(name="bot_id")
     private PlayerBot playerBot;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="sell_order_id")
+    private SellOrder sellOrder;
+
     public PlayerBot getPlayerBot() {
         return playerBot;
     }
 
     public void setPlayerBot(PlayerBot playerBot) {
         this.playerBot = playerBot;
+    }
+
+    public SellOrder getSellOrder() {
+        return sellOrder;
+    }
+
+    public void setSellOrder(SellOrder sellOrder) {
+        this.sellOrder = sellOrder;
     }
 }

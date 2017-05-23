@@ -26,6 +26,12 @@ public class BotOrchestratorApplication {
         SpringApplication.run(BotOrchestratorApplication.class, args);
     }
 
+    //TODO
+    //TODO
+    //TODO -  - - - Do not forget, the pre sell tumbler
+    //TODO
+    //TODO
+
     @Autowired
     private BotCameraRepository botCameraRepository;
 

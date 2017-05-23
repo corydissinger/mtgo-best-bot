@@ -45,7 +45,7 @@ public class OwnedTradeableCardController {
         for(OwnedTradeableCard ownedTradeableCard : ownedTradeableCards) {
             Card card = ownedTradeableCard.getCard();
 
-            Card exists = cardRepository.findByName(card.getName());
+            Card exists = cardRepository.findByNameAndSetAndPremium(card.getName(), card.getSet(), card.getPremium());
 
             if (exists == null) {
                 ownedTradeableCard.setCard(cardRepository.save(card));

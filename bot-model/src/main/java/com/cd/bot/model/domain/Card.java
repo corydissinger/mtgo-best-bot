@@ -21,7 +21,7 @@ public class Card {
 
     private String name;
     private String set;
-    private Boolean isPremium;
+    private Boolean premium;
 
     @ApiModelProperty(hidden = true)
     @OneToMany(mappedBy = "card")
@@ -33,10 +33,10 @@ public class Card {
 
     protected Card() {}
 
-    public Card(String name, String set, Boolean isPremium) {
+    public Card(String name, String set, Boolean premium) {
         this.name = name;
         this.set = set;
-        this.isPremium = isPremium;
+        this.premium = premium;
     }
 
     public Long getId() {
@@ -64,11 +64,11 @@ public class Card {
     }
 
     public Boolean getPremium() {
-        return isPremium;
+        return premium;
     }
 
     public void setPremium(Boolean premium) {
-        isPremium = premium;
+        this.premium = premium;
     }
 
     public List<NpcTradeableCard> getNpcTradeableCards() {

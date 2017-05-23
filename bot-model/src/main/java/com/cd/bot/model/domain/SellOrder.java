@@ -15,19 +15,13 @@ public class SellOrder {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeTaken;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="executed_trade_id")
-    private ExecutedTrade executedTrade;
-
-    @ManyToMany(targetEntity = OwnedTradeableCard.class)
+    @OneToMany(mappedBy = "sellOrder")
     private List<OwnedTradeableCard> ownedTradeableCards;
 
     protected SellOrder() {}
 
-    public SellOrder(Long id, Date timeTaken, ExecutedTrade executedTrade, List<OwnedTradeableCard> ownedTradeableCards) {
-        this.id = id;
+    public SellOrder(Date timeTaken, List<OwnedTradeableCard> ownedTradeableCards) {
         this.timeTaken = timeTaken;
-        this.executedTrade = executedTrade;
         this.ownedTradeableCards = ownedTradeableCards;
     }
 
@@ -45,14 +39,6 @@ public class SellOrder {
 
     public void setTimeTaken(Date timeTaken) {
         this.timeTaken = timeTaken;
-    }
-
-    public ExecutedTrade getExecutedTrade() {
-        return executedTrade;
-    }
-
-    public void setExecutedTrade(ExecutedTrade executedTrade) {
-        this.executedTrade = executedTrade;
     }
 
     public List<OwnedTradeableCard> getOwnedTradeableCards() {

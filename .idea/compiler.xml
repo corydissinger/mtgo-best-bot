@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="bot-api" />
+        <module name="bot-api-wrapper" />
+        <module name="bot-client" />
+        <module name="bot-client-model" />
+        <module name="bot-client-wrapper" />
+        <module name="bot-model" />
+        <module name="bot-orchestrator" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="bot-api" target="1.8" />
+      <module name="bot-api-wrapper" target="1.8" />
+      <module name="bot-client" target="1.8" />
+      <module name="bot-client-model" target="1.8" />
+      <module name="bot-client-wrapper" target="1.8" />
+      <module name="bot-model" target="1.8" />
+      <module name="bot-orchestrator" target="1.6" />
+      <module name="bot-standalone" target="1.8" />
+      <module name="mtgo-best-bot" target="1.6" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

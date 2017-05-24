@@ -1,8 +1,6 @@
 package com.cd.bot.client.tesseract;
 
-import com.cd.bot.client.robot.model.ProcessingLifecycleStatus;
-import com.cd.bot.client.tesseract.model.RawLines;
-import com.cd.bot.client.tesseract.model.RawWord;
+import com.cd.bot.client.model.ProcessingLifecycleStatus;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;

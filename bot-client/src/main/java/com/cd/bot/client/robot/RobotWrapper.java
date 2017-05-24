@@ -1,11 +1,17 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.model.domain.PlayerBot;
-import com.cd.bot.model.domain.BotCamera;
-import com.cd.bot.client.robot.exception.ApplicationDownException;
+import com.cd.bot.client.config.BotConfig;
+import com.cd.bot.client.model.AssumedScreenTest;
+import com.cd.bot.client.model.ProcessingLifecycleStatus;
+import com.cd.bot.client.model.exception.ApplicationDownException;
 import com.cd.bot.client.system.ProcessManager;
-import com.cd.bot.wrapper.http.BotCameraService;
+import com.cd.bot.client.tesseract.RawLines;
+import com.cd.bot.client.tesseract.RawLinesProcessor;
+import com.cd.bot.client.tesseract.TesseractWrapper;
+import com.cd.bot.model.domain.BotCamera;
+import com.cd.bot.model.domain.PlayerBot;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
@@ -21,47 +27,7 @@ import java.util.Date;
  */
 public class RobotWrapper {
 
-    static public class MouseClickEvent {
-        private int xOffset;
-        private int yOffset;
-        private boolean isDouble;
-
-        public int getxOffset() {
-            return xOffset;
-        }
-
-        public void setxOffset(int xOffset) {
-            this.xOffset = xOffset;
-        }
-
-        public int getyOffset() {
-            return yOffset;
-        }
-
-        public void setyOffset(int yOffset) {
-            this.yOffset = yOffset;
-        }
-
-        public boolean isDouble() {
-            return isDouble;
-        }
-
-        public void setDouble(boolean aDouble) {
-            isDouble = aDouble;
-        }
-    }
-
-    static public class InputStringEvent {
-        private String textToInput;
-
-        public String getTextToInput() {
-            return textToInput;
-        }
-
-        public void setTextToInput(String textToInput) {
-            this.textToInput = textToInput;
-        }
-    }
+    private static final Logger logger = Logger.getLogger(RobotWrapper.class);
 
     @Autowired
     private Robot robot;
@@ -85,24 +51,51 @@ public class RobotWrapper {
     private ProcessManager processManager;
 
     @Autowired
-    private BotCameraService botCameraService;
+    private TesseractWrapper tesseractWrapper;
 
-    //private ScreenModel
+    @Autowired
+    private RawLinesProcessor rawLinesProcessor;
 
-    public BufferedImage getCurrentScreen(PlayerBot remotePlayerBot) throws ApplicationDownException {
+    public BotCamera getCurrentScreen(ProcessingLifecycleStatus status, AssumedScreenTest screenTest) throws ApplicationDownException, IOException {
         if(!processManager.isMtgoRunningOrLoading()) {
             throw new ApplicationDownException("MTGO is not running!");
         }
 
-        BufferedImage image = robot.createScreenCapture(new Rectangle(0, 0, screenWidth, screenHeight));
-
-        try {
-            botCameraService.saveBotCam(createBotCamera(image, remotePlayerBot));
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot communicate with API!");
+        BufferedImage bi = robot.createScreenCapture(new Rectangle(0, 0, screenWidth, screenHeight));
+        //TODO - MULTI SCREEN STATE TEST BOIY
+        if(status == ProcessingLifecycleStatus.UNKNOWN) {
+            if(screenTest == AssumedScreenTest.EULA) {
+                screenTest = AssumedScreenTest.HOME_PAGE;
+            } if(screenTest == AssumedScreenTest.HOME_PAGE) {
+                screenTest = AssumedScreenTest.LOGIN;
+            } else {
+                screenTest = AssumedScreenTest.EULA;
+            }
         }
 
-        return image;
+        if(bi != null) {
+            RawLines rawLines;
+
+            if (screenTest != AssumedScreenTest.NOT_NEEDED) {
+                rawLines = tesseractWrapper.getRawText(bi, screenTest.getScreenTestBounds());
+            } else {
+                rawLines = tesseractWrapper.getRawText(bi);
+            }
+
+            logger.info("Processing raw lines");
+            status = rawLinesProcessor.determineLifecycleStatus(rawLines);
+            logger.info("Determined new status: " + status.name());
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(bi, "jpg", baos);
+            baos.flush();
+            byte[] imageAsByteArray = baos.toByteArray();
+            baos.close();
+
+            return new BotCamera(imageAsByteArray, new Date());
+        }
+
+        throw new ApplicationDownException("Somehow made it to this unreachable point");
     }
 
     private BotCamera createBotCamera(BufferedImage image, PlayerBot remotePlayerBot) throws IOException {

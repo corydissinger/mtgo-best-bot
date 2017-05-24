@@ -10,6 +10,10 @@ import net.sourceforge.tess4j.TessAPI1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
@@ -22,17 +26,30 @@ import java.awt.*;
  */
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "com.cd.bot.client", "comd.cd.bot.wrapper" })
-@PropertySource(value = "classpath:client-application.properties")
+@ComponentScan({ "com.cd.bot.client", "com.cd.bot.wrapper" })
+@PropertySources({
+    @PropertySource("classpath:client-application.properties"),
+    @PropertySource("file:${app.home}/client-application.properties") //wins
+})
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
 public class BotConfig {
 
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
+
+    public static void main(String[] args) {
+        ApplicationContext applicationContext = new SpringApplicationBuilder(BotConfig.class).headless(false).run(args);
+    }
 
     @Autowired
     private Environment environment;
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Bean
+    public GraphicsDevice graphicsDevice() {
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    }
 
     @Bean
     public Robot robot() {
@@ -110,6 +127,11 @@ public class BotConfig {
     @Bean
     public String botName() {
         return environment.getRequiredProperty("bot.name");
+    }
+
+    @Bean
+    public String password() {
+        return environment.getRequiredProperty("password");
     }
 
     @Bean

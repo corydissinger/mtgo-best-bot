@@ -1,18 +1,18 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.client.robot.exception.ApplicationDownException;
-import com.cd.bot.client.robot.model.AssumedScreenTest;
-import com.cd.bot.client.robot.model.ProcessingLifecycleStatus;
-import com.cd.bot.client.robot.mtgo.ScreenConstants;
+import com.cd.bot.client.model.AssumedScreenTest;
+import com.cd.bot.client.model.ProcessingLifecycleStatus;
+import com.cd.bot.client.model.constant.ScreenConstants;
+import com.cd.bot.client.model.exception.ApplicationDownException;
+import com.cd.bot.client.tesseract.RawLines;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
-import com.cd.bot.client.tesseract.model.RawLines;
-import com.cd.bot.model.domain.PlayerBot;
-import com.cd.bot.wrapper.http.BotCameraService;
+import com.cd.bot.model.domain.BotCamera;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  * Created by Cory on 5/13/2017.
@@ -31,100 +31,65 @@ public class RobotMaster {
     private RawLinesProcessor rawLinesProcessor;
 
     @Autowired
-    private BotCameraService botCameraService;
-
-    @Autowired
     private String botName;
 
-    public void runBot() {
-        PlayerBot remotePlayerBot = botCameraService.registerOrLoadSelf(new PlayerBot(botName));
+    @Autowired
+    private String password;
 
+    public BotCamera runBot() {
         ProcessingLifecycleStatus status = ProcessingLifecycleStatus.UNKNOWN;
         AssumedScreenTest screenTest = AssumedScreenTest.NOT_NEEDED;
         boolean shouldProcessScreen = false;
 
-        do {
-            logger.info("Current state is: " + status.name());
+        logger.info("Current state is: " + status.name());
 
-            BufferedImage bi = null;
-            int sleepTime = 500;
+        BufferedImage bi = null;
+        int sleepTime = 500;
 
-            switch(status) {
-                case APPLICATION_READY:
-                    screenTest = AssumedScreenTest.COLLECTION_BOUNDS; //do some shits
-                    shouldProcessScreen = true;
-                    break;
-                case TRADE_PARTNER:
-                    screenTest = AssumedScreenTest.TRADE; //do some shits
-                    shouldProcessScreen = true;
-                    break;
-                case UNKNOWN:
-                    shouldProcessScreen = true;
-                    break;
-                case ACCEPT_TOS_EULA_READY:
-                    final int yOffEnd = ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop() + 400;
+        switch(status) {
+            case APPLICATION_READY:
+                screenTest = AssumedScreenTest.COLLECTION_BOUNDS; //do some shits
+                shouldProcessScreen = true;
+                break;
+            case TRADE_PARTNER:
+                screenTest = AssumedScreenTest.TRADE; //do some shits
+                shouldProcessScreen = true;
+                break;
+            case UNKNOWN:
+                shouldProcessScreen = true;
+                break;
+            case ACCEPT_TOS_EULA_READY:
+                final int yOffEnd = ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop() + 400;
 
-                    robotWrapper.clickAndDragVertical(ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getLeft(),
-                                                      ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop(),
-                                                      yOffEnd);
+                robotWrapper.clickAndDragVertical(ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getLeft(),
+                                                  ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop(),
+                                                  yOffEnd);
 
-                    robotWrapper.doubleClickAtLocation(1115, 755);
+                robotWrapper.doubleClickAtLocation(1115, 755);
 
-                    status = ProcessingLifecycleStatus.UNKNOWN;
+                status = ProcessingLifecycleStatus.UNKNOWN;
 
-                    break;
-                case LOGIN_READY:
-                    robotWrapper.singleClickAtLocation(1235, 440);
-                    robotWrapper.writeString("Nova4545");
-                    robotWrapper.doubleClickAtLocation(ScreenConstants.LOGIN_BUTTON_CENTER.getLeft(), ScreenConstants.LOGIN_BUTTON_CENTER.getTop());
+                break;
+            case LOGIN_READY:
+                robotWrapper.singleClickAtLocation(1235, 440);
+                robotWrapper.writeString(password);
+                robotWrapper.doubleClickAtLocation(ScreenConstants.LOGIN_BUTTON_CENTER.getLeft(), ScreenConstants.LOGIN_BUTTON_CENTER.getTop());
 
-                    status = ProcessingLifecycleStatus.UNKNOWN;
-                    sleepTime = 20000;
-                    break;
-            }
+                status = ProcessingLifecycleStatus.UNKNOWN;
+                sleepTime = 20000;
+                break;
+        }
 
-            if(shouldProcessScreen) {
-                try {
-                    bi = robotWrapper.getCurrentScreen(remotePlayerBot);
+        BotCamera botCamera = null;
 
-                    //TODO - MULTI SCREEN STATE TEST BOIY
-                    if(status == ProcessingLifecycleStatus.UNKNOWN) {
-                        if(screenTest == AssumedScreenTest.EULA) {
-                            screenTest = AssumedScreenTest.HOME_PAGE;
-                        } if(screenTest == AssumedScreenTest.HOME_PAGE) {
-                            screenTest = AssumedScreenTest.LOGIN;
-                        } else {
-                            screenTest = AssumedScreenTest.EULA;
-                        }
-                    }
-                } catch (ApplicationDownException e) {
-                    e.printStackTrace();
-                    robotWrapper.reInit();
-                    screenTest = AssumedScreenTest.LOGIN;
-                    sleepTime = 5000;
-                }
+        try {
+            botCamera = robotWrapper.getCurrentScreen(status, screenTest);
+        } catch (ApplicationDownException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-                if(bi != null) {
-                    RawLines rawLines;
-
-                    if(screenTest != AssumedScreenTest.NOT_NEEDED) {
-                        rawLines = tesseractWrapper.getRawText(bi, screenTest.getScreenTestBounds());
-                    } else {
-                        rawLines = tesseractWrapper.getRawText(bi);
-                    }
-
-                    logger.info("Processing raw lines");
-                    status = rawLinesProcessor.determineLifecycleStatus(rawLines);
-                    logger.info("Determined new status: " + status.name());
-                    shouldProcessScreen = false;
-                }
-            }
-
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-        } while (status != ProcessingLifecycleStatus.ABORT_LIFE);
+        return botCamera;
     }
 }

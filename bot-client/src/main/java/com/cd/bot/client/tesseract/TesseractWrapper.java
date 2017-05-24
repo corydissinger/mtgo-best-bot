@@ -1,8 +1,6 @@
 package com.cd.bot.client.tesseract;
 
-import com.cd.bot.client.tesseract.model.RawLines;
-import com.cd.bot.client.tesseract.model.RawWord;
-import com.cd.bot.client.tesseract.model.TesseractRectangle;
+import com.cd.bot.client.model.tesseract.TesseractRectangle;
 import com.sun.jna.Pointer;
 import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.TessAPI1;

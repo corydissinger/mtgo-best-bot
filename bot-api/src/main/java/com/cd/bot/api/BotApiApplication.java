@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.multipart.MultipartResolver;
@@ -33,7 +34,10 @@ import javax.servlet.MultipartConfigElement;
 @EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
 @EntityScan(basePackages = {"com.cd.bot.model.domain"} )
 @ComponentScan(basePackages = {"com.cd.bot.api"} )
-@PropertySource(value = "classpath:api-application.properties")
+@PropertySources({
+        @PropertySource("classpath:api-application.properties"),
+        @PropertySource("file:${app.home}/api-application.properties") //wins
+})
 public class BotApiApplication {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(BotApiApplication.class, args);

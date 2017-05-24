@@ -17,6 +17,14 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.awt.*;
@@ -32,12 +40,40 @@ import java.awt.*;
     @PropertySource("file:${app.home}/client-application.properties") //wins
 })
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
-public class BotConfig {
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class BotConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
 
+    public static final String ROLE_MASTER = "ROLE_MASTER";
+
     public static void main(String[] args) {
         ApplicationContext applicationContext = new SpringApplicationBuilder(BotConfig.class).headless(false).run(args);
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().anyRequest().authenticated()
+                .and()
+                .x509()
+                .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
+                .userDetailsService(userDetailsService());
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) {
+                if (username.equals("master")) {
+                    return new User(username, "",
+                            AuthorityUtils
+                                    .commaSeparatedStringToAuthorityList(ROLE_MASTER));
+                }
+                return null;
+            }
+        };
     }
 
     @Autowired

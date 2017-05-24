@@ -78,7 +78,8 @@ public class RobotMaster {
         try {
             outcome = robotWrapper.getCurrentScreen(status, screenTest);
         } catch (ApplicationDownException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            return new LifecycleEventOutcome(null, ProcessingLifecycleStatus.APPLICATION_DOWN);
         } catch (IOException e) {
             e.printStackTrace();
         }

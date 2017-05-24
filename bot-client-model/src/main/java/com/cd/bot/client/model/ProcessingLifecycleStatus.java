@@ -6,6 +6,7 @@ package com.cd.bot.client.model;
 public enum ProcessingLifecycleStatus {
     UNKNOWN,
     AWAIT_APPLICATION_READY,
+    APPLICATION_DOWN,
     APPLICATION_READY,
     TRADE_PARTNER,
     ACCEPT_TOS_EULA_READY,

@@ -1,11 +1,13 @@
 package com.cd.bot.client.controller;
 
+import com.cd.bot.client.config.BotConfig;
 import com.cd.bot.client.model.LifecycleEvent;
 import com.cd.bot.client.model.LifecycleEventOutcome;
 import com.cd.bot.client.robot.RobotMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,6 +23,7 @@ public class RobotLifecycleController {
 
     private AtomicBoolean isRunning = new AtomicBoolean(false);
 
+    @PreAuthorize(BotConfig.ROLE_MASTER)
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public ResponseEntity<Void> status() {
         if(isRunning.get()) {
@@ -31,6 +34,7 @@ public class RobotLifecycleController {
 
     }
 
+    @PreAuthorize(BotConfig.ROLE_MASTER)
     @RequestMapping(value = "/client-bot", method = RequestMethod.POST)
     public @ResponseBody LifecycleEventOutcome runBot(@RequestBody final LifecycleEvent lifecycleEvent) {
         isRunning.set(true);

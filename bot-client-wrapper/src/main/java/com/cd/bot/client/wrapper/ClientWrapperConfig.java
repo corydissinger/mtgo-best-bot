@@ -54,25 +54,14 @@ public class ClientWrapperConfig {
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(clientStore, keystorePassword.toCharArray());
-            KeyManager[] keyManagers = kmf.getKeyManagers();
 
             KeyStore trustStore = KeyStore.getInstance("JKS");
             trustStore.load(new FileInputStream(trustStoreLocation), trustStorePassword.toCharArray());
 
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(trustStore);
-            TrustManager[] tms = tmf.getTrustManagers();
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(keyManagers, tms, new SecureRandom());
-            final KeyStore keyStore = KeyStore.getInstance("JKS");
-
-            keyStore.load(new FileInputStream(keystoreLocation), keystorePassword.toCharArray());
-
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(
                     new SSLContextBuilder()
-                            .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-                            .loadKeyMaterial(keyStore, keystorePassword.toCharArray())
+                            .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
+                            .loadKeyMaterial(clientStore, keystorePassword.toCharArray())
                             .build(),
                     NoopHostnameVerifier.INSTANCE);
 

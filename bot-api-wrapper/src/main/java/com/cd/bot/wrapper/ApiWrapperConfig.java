@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 public class ApiWrapperConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
+    public RestTemplate apiRestTemplate() {
         return new RestTemplate();
     }
 

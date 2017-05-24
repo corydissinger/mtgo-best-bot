@@ -3,16 +3,14 @@ package com.cd.bot.api;
 import com.cd.bot.api.controller.BotController;
 import com.cd.bot.api.controller.BotStatusController;
 import com.cd.bot.api.controller.BotCameraController;
+import com.cd.bot.client.wrapper.ClientWrapperConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.*;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.multipart.MultipartResolver;
@@ -38,6 +36,7 @@ import javax.servlet.MultipartConfigElement;
         @PropertySource("classpath:api-application.properties"),
         @PropertySource("file:${app.home}/api-application.properties") //wins
 })
+@Import(ClientWrapperConfig.class)
 public class BotApiApplication {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(BotApiApplication.class, args);
@@ -45,6 +44,11 @@ public class BotApiApplication {
 
     @Autowired
     private Environment environment;
+
+    @Bean
+    public String botClientUrl() {
+        return environment.getRequiredProperty("bot.client.url"); //Needs to be smarter
+    }
 
     @Bean
     public Docket botApi() {

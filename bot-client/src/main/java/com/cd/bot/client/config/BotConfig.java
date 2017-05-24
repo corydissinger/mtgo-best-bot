@@ -47,11 +47,6 @@ public class BotConfig {
     private ApplicationContext applicationContext;
 
     @Bean
-    public GraphicsDevice graphicsDevice() {
-        return GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-    }
-
-    @Bean
     public Robot robot() {
         Robot theRobot = null;
         try {

@@ -1,6 +1,8 @@
 package com.cd.bot.client.robot;
 
 import com.cd.bot.client.model.AssumedScreenTest;
+import com.cd.bot.client.model.LifecycleEvent;
+import com.cd.bot.client.model.LifecycleEventOutcome;
 import com.cd.bot.client.model.ProcessingLifecycleStatus;
 import com.cd.bot.client.model.constant.ScreenConstants;
 import com.cd.bot.client.model.exception.ApplicationDownException;
@@ -36,27 +38,21 @@ public class RobotMaster {
     @Autowired
     private String password;
 
-    public BotCamera runBot() {
-        ProcessingLifecycleStatus status = ProcessingLifecycleStatus.UNKNOWN;
-        AssumedScreenTest screenTest = AssumedScreenTest.NOT_NEEDED;
-        boolean shouldProcessScreen = false;
+    public LifecycleEventOutcome runBot(LifecycleEvent lifecycleEvent) {
+        LifecycleEventOutcome outcome = null;
+        ProcessingLifecycleStatus status = lifecycleEvent.getProcessingLifecycleStatus();
+        AssumedScreenTest screenTest = lifecycleEvent.getAssumedScreenTest();
 
         logger.info("Current state is: " + status.name());
-
-        BufferedImage bi = null;
-        int sleepTime = 500;
 
         switch(status) {
             case APPLICATION_READY:
                 screenTest = AssumedScreenTest.COLLECTION_BOUNDS; //do some shits
-                shouldProcessScreen = true;
                 break;
             case TRADE_PARTNER:
                 screenTest = AssumedScreenTest.TRADE; //do some shits
-                shouldProcessScreen = true;
                 break;
             case UNKNOWN:
-                shouldProcessScreen = true;
                 break;
             case ACCEPT_TOS_EULA_READY:
                 final int yOffEnd = ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop() + 400;
@@ -76,20 +72,21 @@ public class RobotMaster {
                 robotWrapper.doubleClickAtLocation(ScreenConstants.LOGIN_BUTTON_CENTER.getLeft(), ScreenConstants.LOGIN_BUTTON_CENTER.getTop());
 
                 status = ProcessingLifecycleStatus.UNKNOWN;
-                sleepTime = 20000;
                 break;
         }
 
-        BotCamera botCamera = null;
-
         try {
-            botCamera = robotWrapper.getCurrentScreen(status, screenTest);
+            outcome = robotWrapper.getCurrentScreen(status, screenTest);
         } catch (ApplicationDownException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return botCamera;
+        if(outcome == null) {
+            return new LifecycleEventOutcome(null, ProcessingLifecycleStatus.UNKNOWN);
+        }
+
+        return outcome;
     }
 }

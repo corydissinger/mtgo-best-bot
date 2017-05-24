@@ -1,6 +1,6 @@
 package com.cd.bot.client.wrapper;
 
-import com.cd.bot.wrapper.http.BotClientService;
+import com.cd.bot.wrapper.http.BotClientRestClient;
 import org.springframework.context.annotation.*;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
@@ -20,8 +20,8 @@ public class ClientWrapperConfig {
     }
 
     @Bean
-    public BotClientService botCameraService() {
-        return new BotClientService();
+    public BotClientRestClient botCameraService() {
+        return new BotClientRestClient();
     }
 
 }

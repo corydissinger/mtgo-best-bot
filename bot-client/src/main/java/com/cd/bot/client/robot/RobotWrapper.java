@@ -2,6 +2,7 @@ package com.cd.bot.client.robot;
 
 import com.cd.bot.client.config.BotConfig;
 import com.cd.bot.client.model.AssumedScreenTest;
+import com.cd.bot.client.model.LifecycleEventOutcome;
 import com.cd.bot.client.model.ProcessingLifecycleStatus;
 import com.cd.bot.client.model.exception.ApplicationDownException;
 import com.cd.bot.client.system.ProcessManager;
@@ -56,7 +57,7 @@ public class RobotWrapper {
     @Autowired
     private RawLinesProcessor rawLinesProcessor;
 
-    public BotCamera getCurrentScreen(ProcessingLifecycleStatus status, AssumedScreenTest screenTest) throws ApplicationDownException, IOException {
+    public LifecycleEventOutcome getCurrentScreen(ProcessingLifecycleStatus status, AssumedScreenTest screenTest) throws ApplicationDownException, IOException {
         if(!processManager.isMtgoRunningOrLoading()) {
             throw new ApplicationDownException("MTGO is not running!");
         }
@@ -92,7 +93,10 @@ public class RobotWrapper {
             byte[] imageAsByteArray = baos.toByteArray();
             baos.close();
 
-            return new BotCamera(imageAsByteArray, new Date());
+            BotCamera botCamera = new BotCamera(imageAsByteArray, new Date());
+
+            return new LifecycleEventOutcome(botCamera, status);
+
         }
 
         throw new ApplicationDownException("Somehow made it to this unreachable point");

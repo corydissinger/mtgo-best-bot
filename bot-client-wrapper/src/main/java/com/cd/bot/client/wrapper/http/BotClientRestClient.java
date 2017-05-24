@@ -1,9 +1,7 @@
 package com.cd.bot.wrapper.http;
 
-import com.cd.bot.client.model.AssumedScreenTest;
 import com.cd.bot.client.model.LifecycleEvent;
 import com.cd.bot.client.model.LifecycleEventOutcome;
-import com.cd.bot.client.model.ProcessingLifecycleStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,9 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Created by Cory on 5/16/2017.
  */
-public class BotClientService {
+public class BotClientRestClient {
 
-    private static final Logger log = LoggerFactory.getLogger(BotClientService.class);
+    private static final Logger log = LoggerFactory.getLogger(BotClientRestClient.class);
 
     @Autowired
     @Qualifier("clientRestTemplate")

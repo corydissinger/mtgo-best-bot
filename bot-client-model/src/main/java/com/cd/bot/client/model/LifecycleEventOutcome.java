@@ -9,6 +9,12 @@ import java.io.Serializable;
  */
 public class LifecycleEventOutcome implements Serializable {
     private BotCamera botCamera;
+    private ProcessingLifecycleStatus processingLifecycleStatus;
+
+    public LifecycleEventOutcome(BotCamera botCamera, ProcessingLifecycleStatus processingLifecycleStatus) {
+        this.botCamera = botCamera;
+        this.processingLifecycleStatus = processingLifecycleStatus;
+    }
 
     public BotCamera getBotCamera() {
         return botCamera;
@@ -16,5 +22,13 @@ public class LifecycleEventOutcome implements Serializable {
 
     public void setBotCamera(BotCamera botCamera) {
         this.botCamera = botCamera;
+    }
+
+    public ProcessingLifecycleStatus getProcessingLifecycleStatus() {
+        return processingLifecycleStatus;
+    }
+
+    public void setProcessingLifecycleStatus(ProcessingLifecycleStatus processingLifecycleStatus) {
+        this.processingLifecycleStatus = processingLifecycleStatus;
     }
 }

@@ -10,7 +10,7 @@ CLIENTNAME=master
 # ST = State Name
 # C  = Country (2-letter Country Code)
 # E  = Email
-DNAME_CA='CN=Baeldung CA,OU=baeldung.com,O=Baeldung,L=SomeCity,ST=SomeState,C=CC'
+DNAME_CA='CN=master,OU=baeldung.com,O=Baeldung,L=SomeCity,ST=SomeState,C=CC'
 # For server certificates, the Common Name (CN) must be the hostname
 DNAME_HOST='CN=$(HOSTNAME),OU=baeldung.com,O=Baeldung,L=SomeCity,ST=SomeState,C=CC'
 DNAME_CLIENT='CN=$(CLIENTNAME),OU=baeldung.com,O=Baeldung,L=SomeCity,ST=SomeState,C=CC'

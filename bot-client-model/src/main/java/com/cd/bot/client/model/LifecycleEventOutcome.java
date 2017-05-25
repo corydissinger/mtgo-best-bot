@@ -1,6 +1,7 @@
 package com.cd.bot.client.model;
 
 import com.cd.bot.model.domain.BotCamera;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
@@ -10,6 +11,13 @@ import java.io.Serializable;
 public class LifecycleEventOutcome implements Serializable {
     private BotCamera botCamera;
     private ProcessingLifecycleStatus processingLifecycleStatus;
+
+    public LifecycleEventOutcome() {}
+
+    public LifecycleEventOutcome(ProcessingLifecycleStatus processingLifecycleStatus) {
+        this.processingLifecycleStatus = processingLifecycleStatus;
+        this.botCamera = null;
+    }
 
     public LifecycleEventOutcome(BotCamera botCamera, ProcessingLifecycleStatus processingLifecycleStatus) {
         this.botCamera = botCamera;

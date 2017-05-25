@@ -19,7 +19,7 @@ public class BotClientController {
     private BotClientService botClientService;
 
     @RequestMapping(value = "/client", method = RequestMethod.POST)
-    public @ResponseBody LifecycleEventOutcome runClient(@RequestBody LifecycleEvent lifecycleEvent) {
+    public @ResponseBody LifecycleEventOutcome runClient(@RequestBody final LifecycleEvent lifecycleEvent) {
         LifecycleEventOutcome outcome = botClientService.runClient(lifecycleEvent);
         return outcome;
     }

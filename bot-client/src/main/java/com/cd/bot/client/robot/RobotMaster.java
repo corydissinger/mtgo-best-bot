@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by Cory on 5/13/2017.
@@ -73,19 +74,22 @@ public class RobotMaster {
 
                 status = ProcessingLifecycleStatus.UNKNOWN;
                 break;
+            case APPLICATION_START:
+                robotWrapper.reInit();
+                break;
         }
 
         try {
             outcome = robotWrapper.getCurrentScreen(status, screenTest);
         } catch (ApplicationDownException e) {
             logger.error(e.getMessage());
-            return new LifecycleEventOutcome(null, ProcessingLifecycleStatus.APPLICATION_DOWN);
+            return new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.APPLICATION_DOWN);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         if(outcome == null) {
-            return new LifecycleEventOutcome(null, ProcessingLifecycleStatus.UNKNOWN);
+            return new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.UNKNOWN);
         }
 
         return outcome;

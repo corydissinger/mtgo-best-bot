@@ -47,6 +47,7 @@ public class BotConfig extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
 
     public static final String ROLE_MASTER = "ROLE_MASTER";
+    public static final String HAS_AUTH_ROLE_MASTER = "hasAuthority('"+ROLE_MASTER+"')";
 
     public static void main(String[] args) {
         ApplicationContext applicationContext = new SpringApplicationBuilder(BotConfig.class).headless(false).run(args);

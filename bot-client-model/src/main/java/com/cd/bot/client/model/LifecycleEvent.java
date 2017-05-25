@@ -9,6 +9,13 @@ public class LifecycleEvent implements Serializable {
     private AssumedScreenTest assumedScreenTest;
     private ProcessingLifecycleStatus processingLifecycleStatus;
 
+    public LifecycleEvent() {}
+
+    public LifecycleEvent(AssumedScreenTest assumedScreenTest, ProcessingLifecycleStatus processingLifecycleStatus) {
+        this.assumedScreenTest = assumedScreenTest;
+        this.processingLifecycleStatus = processingLifecycleStatus;
+    }
+
     public AssumedScreenTest getAssumedScreenTest() {
         return assumedScreenTest;
     }

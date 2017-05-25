@@ -36,7 +36,6 @@ public class BotClientRestClient {
             throw new RuntimeException();
         }
 
-
         if(resp.getStatusCode() != HttpStatus.OK) {
             throw new RuntimeException("PlayerBot is not registered");
         }

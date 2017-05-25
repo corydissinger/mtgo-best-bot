@@ -119,8 +119,6 @@ public class RobotWrapper {
         } else {
             processManager.startApplication();
         }
-
-        //Clean up any state we keep track of
     }
 
     public void clickAndDragVertical(int xOffOrig, int yOffOrig, int yOffEnd) {

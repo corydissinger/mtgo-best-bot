@@ -23,7 +23,7 @@ public class RobotLifecycleController {
 
     private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    @PreAuthorize(BotConfig.ROLE_MASTER)
+    @PreAuthorize(BotConfig.HAS_AUTH_ROLE_MASTER)
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public ResponseEntity<Void> status() {
         if(isRunning.get()) {
@@ -34,7 +34,7 @@ public class RobotLifecycleController {
 
     }
 
-    @PreAuthorize(BotConfig.ROLE_MASTER)
+    @PreAuthorize(BotConfig.HAS_AUTH_ROLE_MASTER)
     @RequestMapping(value = "/client-bot", method = RequestMethod.POST)
     public @ResponseBody LifecycleEventOutcome runBot(@RequestBody final LifecycleEvent lifecycleEvent) {
         isRunning.set(true);

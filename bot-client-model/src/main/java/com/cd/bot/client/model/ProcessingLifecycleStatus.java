@@ -12,5 +12,6 @@ public enum ProcessingLifecycleStatus {
     ACCEPT_TOS_EULA_READY,
     LOGIN_READY,
     LOGGING_IN,
-    ABORT_LIFE
+    ABORT_LIFE,
+    APPLICATION_START
 }

@@ -1,13 +1,14 @@
 package com.cd.bot.model.domain;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Cory on 5/16/2017.
  */
 @Entity
-public class BotCamera {
+public class BotCamera implements Serializable {
     @Id
     @GeneratedValue
     private Long id;

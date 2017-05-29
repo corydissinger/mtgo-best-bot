@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,6 +28,7 @@ import java.util.Arrays;
 /**
  * Created by Cory on 5/16/2017.
  */
+@Service
 public class BotCameraService {
 
     private static final Logger log = LoggerFactory.getLogger(BotCameraService.class);

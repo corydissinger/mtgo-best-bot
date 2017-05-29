@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.*;
  * Created by Cory on 5/23/2017.
  */
 @RestController
-public class BotClientController {
+public class BotPushController {
+
+    public static final String ENDPOINT_ROOT = "/client";
 
     @Autowired
     private BotClientService botClientService;
 
-    @RequestMapping(value = "/client", method = RequestMethod.POST)
+    @RequestMapping(value = ENDPOINT_ROOT + "/name/{name}", method = RequestMethod.POST)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
     public @ResponseBody LifecycleEventOutcome runClient(@RequestBody final LifecycleEvent lifecycleEvent) {
         LifecycleEventOutcome outcome = botClientService.runClient(lifecycleEvent);

@@ -6,6 +6,7 @@ import com.cd.bot.client.model.LifecycleEventOutcome;
 import com.cd.bot.client.model.ProcessingLifecycleStatus;
 import com.cd.bot.client.model.constant.ScreenConstants;
 import com.cd.bot.client.model.exception.ApplicationDownException;
+import com.cd.bot.client.system.ProcessManager;
 import com.cd.bot.client.tesseract.RawLines;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
@@ -32,6 +33,9 @@ public class RobotMaster {
 
     @Autowired
     private RawLinesProcessor rawLinesProcessor;
+
+    @Autowired
+    private ProcessManager processManager;
 
     @Autowired
     private String botName;
@@ -75,7 +79,10 @@ public class RobotMaster {
                 status = ProcessingLifecycleStatus.UNKNOWN;
                 break;
             case APPLICATION_START:
-                robotWrapper.reInit();
+                if(!processManager.isMtgoRunningOrLoading()) {
+                    robotWrapper.reInit();
+                }
+
                 break;
         }
 

@@ -3,6 +3,7 @@ package com.cd.bot.wrapper;
 import com.cd.bot.wrapper.http.BotCameraService;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,13 +27,9 @@ import org.springframework.web.client.RestTemplate;
 public class ApiWrapperConfig {
 
     @Bean
+    @Qualifier("apiRestTemplate")
     public RestTemplate apiRestTemplate() {
         return new RestTemplate();
-    }
-
-    @Bean
-    public BotCameraService botCameraService() {
-        return new BotCameraService();
     }
 
     @Bean

@@ -46,4 +46,5 @@ public class BotOrchestratorApplication {
         Date oneHourBack = cal.getTime();
         botCameraRepository.deleteOlderThan(oneHourBack);
     }
+
 }

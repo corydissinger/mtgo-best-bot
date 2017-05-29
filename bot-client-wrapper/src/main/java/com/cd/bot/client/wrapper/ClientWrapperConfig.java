@@ -27,8 +27,8 @@ import java.security.cert.CertificateException;
 @EnableTransactionManagement
 @ComponentScan({ "com.cd.bot.client.wrapper" })
 @PropertySources({
-        @PropertySource("classpath:wrapper-application.properties"),
-        @PropertySource("file:${app.home}/wrapper-application.properties") //wins
+        @PropertySource("classpath:client-wrapper-application.properties"),
+        @PropertySource("file:${app.home}/client-wrapper-application.properties") //wins
 })
 public class ClientWrapperConfig {
 
@@ -66,19 +66,7 @@ public class ClientWrapperConfig {
                     NoopHostnameVerifier.INSTANCE);
 
             return socketFactory;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableKeyException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

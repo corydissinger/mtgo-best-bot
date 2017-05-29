@@ -4,6 +4,13 @@ import com.cd.bot.wrapper.http.BotCameraService;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.context.annotation.*;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,9 +18,11 @@ import org.springframework.web.client.RestTemplate;
 @EnableTransactionManagement
 @ComponentScan({ "com.cd.bot.wrapper" })
 @PropertySources({
-        @PropertySource("classpath:wrapper-application.properties"),
-        @PropertySource("file:${app.home}/wrapper-application.properties") //wins
+        @PropertySource("classpath:api-wrapper-application.properties"),
+        @PropertySource("file:${app.home}/api-wrapper-application.properties") //wins
 })
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApiWrapperConfig {
 
     @Bean

@@ -14,6 +14,14 @@ import org.springframework.context.annotation.*;
 
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartResolver;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -38,11 +46,15 @@ import javax.servlet.MultipartConfigElement;
         @PropertySource("file:${app.home}/api-application.properties") //wins
 })
 @Import(ClientWrapperConfig.class)
-@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class })
-public class BotApiApplication {
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class BotApiApplication extends WebSecurityConfigurerAdapter {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(BotApiApplication.class, args);
     }
+
+    public static final String ROLE_ORCHESTRATOR = "ROLE_ORCHESTRATOR";
+    public static final String HAS_AUTH_ROLE_ORCHESTRATOR = "hasAuthority('"+ROLE_ORCHESTRATOR+"')";
 
     @Autowired
     private Environment environment;
@@ -68,6 +80,31 @@ public class BotApiApplication {
         return new ApiInfoBuilder()
                 .description("Control the MTGO bots")
                 .build();
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+                .authorizeRequests().anyRequest().authenticated()
+                .and()
+                .x509()
+                .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
+                .userDetailsService(userDetailsService());
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) {
+                if (username.equals("orchestrator")) {
+                    return new User(username, "",
+                            AuthorityUtils
+                                    .commaSeparatedStringToAuthorityList(ROLE_ORCHESTRATOR));
+                }
+                return null;
+            }
+        };
     }
 
 }

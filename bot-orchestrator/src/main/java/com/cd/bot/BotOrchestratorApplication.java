@@ -9,12 +9,14 @@ import com.cd.bot.wrapper.ApiWrapperConfig;
 import com.cd.bot.wrapper.http.BotPushService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
@@ -49,7 +51,10 @@ public class BotOrchestratorApplication {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(BotOrchestratorApplication.class);
 
     public static void main(String[] args) {
-        ApplicationContext applicationContext = new SpringApplicationBuilder(BotOrchestratorApplication.class).run(args);
+        SpringApplication app = new SpringApplication(BotOrchestratorApplication.class);
+        app.setWebEnvironment(false);
+        ConfigurableApplicationContext ctx = app.run(args);
+
     }
 
     //TODO

@@ -29,7 +29,7 @@ public class OwnedTradeableCardService {
     private RestTemplate restTemplate;
 
     @Autowired
-    private String botApiUrl;
+    private String apiUrl;
 
     public void addCards(List<OwnedTradeableCard> ownedTradeableCards, String accountName) {
         HttpHeaders headers = new HttpHeaders();
@@ -37,7 +37,7 @@ public class OwnedTradeableCardService {
         HttpEntity<Object> requestEntity = new HttpEntity<>(ownedTradeableCards, headers);
 
         try {
-            restTemplate.exchange(botApiUrl + OwnedTradeableCardController.ENDPOINT_ROOT + "/name/" + accountName, HttpMethod.POST, requestEntity, Void.class);
+            restTemplate.exchange(apiUrl + OwnedTradeableCardController.ENDPOINT_ROOT + "/name/" + accountName, HttpMethod.POST, requestEntity, Void.class);
         } catch (RestClientException e) {
             log.error("Failed to add cards!");
             log.error(e.getMessage());

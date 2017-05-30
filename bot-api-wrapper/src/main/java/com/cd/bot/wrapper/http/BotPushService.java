@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class BotPushService {
     private RestTemplate restTemplate;
 
     @Autowired
-    private String botApiUrl;
+    private String apiUrl;
 
     public LifecycleEventOutcome pushEvent(final LifecycleEvent lifecycleEvent, String accountName) {
         HttpHeaders headers = new HttpHeaders();
@@ -41,10 +42,10 @@ public class BotPushService {
         LifecycleEventOutcome outcome = null;
 
         try {
-            restTemplate.exchange(botApiUrl + BotPushController.ENDPOINT_ROOT + "/name/" + accountName, HttpMethod.POST, requestEntity, LifecycleEventOutcome.class);
+            restTemplate.exchange(apiUrl + BotPushController.ENDPOINT_ROOT + "/name/" + accountName, HttpMethod.POST, requestEntity, LifecycleEventOutcome.class);
         } catch (RestClientException e) {
             log.error(e.getMessage());
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
 
         return outcome;

@@ -86,6 +86,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<classifier>exec</classifier>
+					<excludeArtifactIds>bot-client</excludeArtifactIds>
 				</configuration>
 			</plugin>
 		</plugins>

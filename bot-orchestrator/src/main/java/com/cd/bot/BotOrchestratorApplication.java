@@ -17,10 +17,7 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -38,6 +35,7 @@ import java.util.concurrent.*;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
 @EntityScan(basePackages = {"com.cd.bot.model.domain"} )
+@ComponentScan(basePackages = {"com.cd.bot.wrapper"})
 @EnableScheduling
 @EnableAsync
 @EnableAutoConfiguration(exclude={WebMvcAutoConfiguration.class})
@@ -45,7 +43,6 @@ import java.util.concurrent.*;
         @PropertySource("classpath:orchestrator-application.properties"),
         @PropertySource("file:${app.home}/orchestrator-application.properties") //wins
 })
-@Import({ApiWrapperConfig.class})
 public class BotOrchestratorApplication {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(BotOrchestratorApplication.class);

@@ -55,11 +55,12 @@ public class ApiWrapperConfig {
 
     @Bean(name = "httpClient")
     public HttpClient httpClient() throws Exception {
-        return HttpClientBuilder.create().setSSLSocketFactory(sslSocketFactory())
-                .build();
+        return HttpClientBuilder.create()
+                                .setSSLSocketFactory(sslSocketFactory())
+                                .build();
     }
 
-    @Bean
+    @Bean(name = "sslSocketFactory")
     public SSLConnectionSocketFactory sslSocketFactory() {
         final String keystoreLocation = environment.getRequiredProperty("keystore.location");
         final String trustStoreLocation = environment.getRequiredProperty("trust.store.location");

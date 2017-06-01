@@ -1,4 +1,4 @@
-package com.cd.bot.json;
+package com.cd.bot.orchestrator.json;
 
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;

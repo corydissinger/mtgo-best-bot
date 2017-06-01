@@ -1,12 +1,12 @@
-package com.cd.bot;
+package com.cd.bot.orchestrator;
 
 import com.cd.bot.client.model.AssumedScreenTest;
 import com.cd.bot.client.model.LifecycleEvent;
 import com.cd.bot.client.model.LifecycleEventOutcome;
 import com.cd.bot.client.model.ProcessingLifecycleStatus;
+import com.cd.bot.client.wrapper.ClientWrapperConfig;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
-import com.cd.bot.wrapper.ApiWrapperConfig;
-import com.cd.bot.wrapper.http.BotPushService;
+import com.cd.bot.orchestrator.service.BotClientService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -14,20 +14,17 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 /**
  * Created by Cory on 5/16/2017.
@@ -35,7 +32,7 @@ import java.util.concurrent.*;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
 @EntityScan(basePackages = {"com.cd.bot.model.domain"} )
-@ComponentScan(basePackages = {"com.cd.bot.wrapper"})
+@ComponentScan(basePackages = {"com.cd.bot.client.wrapper", "com.cd.bot.orchestrator"})
 @EnableScheduling
 @EnableAsync
 @EnableAutoConfiguration(exclude={WebMvcAutoConfiguration.class})
@@ -43,6 +40,7 @@ import java.util.concurrent.*;
         @PropertySource("classpath:orchestrator-application.properties"),
         @PropertySource("file:${app.home}/orchestrator-application.properties") //wins
 })
+@Import(ClientWrapperConfig.class)
 public class BotOrchestratorApplication {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(BotOrchestratorApplication.class);
@@ -60,7 +58,7 @@ public class BotOrchestratorApplication {
     //TODO
     //TODO
     @Autowired
-    private BotPushService botPushService;
+    private BotClientService botClientService;
 
     @Autowired
     private BotCameraRepository botCameraRepository;
@@ -78,7 +76,7 @@ public class BotOrchestratorApplication {
         botCameraRepository.deleteOlderThan(oneHourBack);
     }
 
-    @Scheduled(fixedDelay = 160)
+    @Scheduled(fixedDelay = 5000)
     public void doWork() {
         final ConcurrentLinkedQueue<LifecycleEvent> eventQueue = eventQueue();
 
@@ -86,24 +84,17 @@ public class BotOrchestratorApplication {
             eventQueue.add(new LifecycleEvent(AssumedScreenTest.NOT_NEEDED, ProcessingLifecycleStatus.APPLICATION_START));
         }
 
-        Future<LifecycleEventOutcome> outcome = pushEvent(eventQueue.remove());
+        Consumer<LifecycleEventOutcome> outcomeConsumer = outcome -> {
+            final ProcessingLifecycleStatus outcomeStatus = outcome.getProcessingLifecycleStatus();
 
-        try {
-            final LifecycleEventOutcome finalOutcome = outcome.get();
-            final ProcessingLifecycleStatus outcomeStatus = finalOutcome.getProcessingLifecycleStatus();
-
-            switch(outcomeStatus) {
+            switch (outcomeStatus) {
                 case UNKNOWN:
                     eventQueue.add(new LifecycleEvent(AssumedScreenTest.LOGIN, ProcessingLifecycleStatus.LOGIN_READY));
                     break;
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        };
+
+        botClientService.pushEvent(eventQueue.remove(), outcomeConsumer);
     }
 
-    @Async
-    public Future<LifecycleEventOutcome> pushEvent(LifecycleEvent lifecycleEvent) {
-        return CompletableFuture.completedFuture(botPushService.pushEvent(lifecycleEvent, "baronvonfonz"));
-    }
 }

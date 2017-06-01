@@ -40,7 +40,7 @@ import javax.servlet.MultipartConfigElement;
 @EnableSwagger2
 @EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
 @EntityScan(basePackages = {"com.cd.bot.model.domain"} )
-@ComponentScan(basePackages = {"com.cd.bot.api"} )
+@ComponentScan(basePackages = {"com.cd.bot.api", "com.cd.bot.client.wrapper"} )
 @PropertySources({
         @PropertySource("classpath:api-application.properties"),
         @PropertySource("file:${app.home}/api-application.properties") //wins

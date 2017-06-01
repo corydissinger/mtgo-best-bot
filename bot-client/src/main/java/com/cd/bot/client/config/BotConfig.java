@@ -13,19 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import java.awt.*;
 
@@ -39,43 +36,14 @@ import java.awt.*;
     @PropertySource("classpath:client-application.properties"),
     @PropertySource("file:${app.home}/client-application.properties") //wins
 })
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class BotConfig extends WebSecurityConfigurerAdapter {
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class, WebMvcAutoConfiguration.class })
+@EnableWebSocketMessageBroker
+public class BotConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
 
-    public static final String ROLE_MASTER = "ROLE_MASTER";
-    public static final String HAS_AUTH_ROLE_MASTER = "hasAuthority('"+ROLE_MASTER+"')";
-
     public static void main(String[] args) {
         ApplicationContext applicationContext = new SpringApplicationBuilder(BotConfig.class).headless(false).run(args);
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests().anyRequest().authenticated()
-                .and()
-                .x509()
-                .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
-                .userDetailsService(userDetailsService());
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String username) {
-                if (username.equals("master")) {
-                    return new User(username, "",
-                            AuthorityUtils
-                                    .commaSeparatedStringToAuthorityList(ROLE_MASTER));
-                }
-                return null;
-            }
-        };
     }
 
     @Autowired
@@ -83,6 +51,16 @@ public class BotConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/client-bot");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/gs-guide-websocket").withSockJS();
+    }
 
     @Bean
     public Robot robot() {

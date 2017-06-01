@@ -21,6 +21,11 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -39,8 +44,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.cd.bot.wrapper</groupId>
-			<artifactId>bot-api-wrapper</artifactId>
+			<groupId>com.cd.bot.client.wrapper</groupId>
+			<artifactId>bot-client-wrapper</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -57,7 +62,7 @@
 				<configuration>
 					<classifier>exec</classifier>
 					<excludeGroupIds>io.springfox, io.swagger, org.thymeleaf</excludeGroupIds>
-					<excludeArtifactIds>bot-client, bot-api</excludeArtifactIds>
+					<excludeArtifactIds>bot-api</excludeArtifactIds>
 				</configuration>
 			</plugin>
 		</plugins>

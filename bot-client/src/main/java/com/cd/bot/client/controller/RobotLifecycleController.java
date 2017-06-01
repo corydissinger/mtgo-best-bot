@@ -1,45 +1,25 @@
 package com.cd.bot.client.controller;
 
-import com.cd.bot.client.config.BotConfig;
 import com.cd.bot.client.model.LifecycleEvent;
 import com.cd.bot.client.model.LifecycleEventOutcome;
 import com.cd.bot.client.robot.RobotMaster;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.stereotype.Controller;
 
 /**
  * Created by Cory on 5/23/2017.
  */
-@RestController
+@Controller
 public class RobotLifecycleController {
 
     @Autowired
     private RobotMaster robotMaster;
 
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
-
-    @PreAuthorize(BotConfig.HAS_AUTH_ROLE_MASTER)
-    @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public ResponseEntity<Void> status() {
-        if(isRunning.get()) {
-            return new ResponseEntity<>(HttpStatus.PROCESSING);
-        } else {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-    }
-
-    @PreAuthorize(BotConfig.HAS_AUTH_ROLE_MASTER)
-    @RequestMapping(value = "/client-bot", method = RequestMethod.POST)
-    public @ResponseBody LifecycleEventOutcome runBot(@RequestBody final LifecycleEvent lifecycleEvent) {
-        isRunning.set(true);
-        LifecycleEventOutcome outcome = robotMaster.runBot(lifecycleEvent);
-        isRunning.set(false);
-        return outcome;
+    @MessageMapping("/client-bot")
+    @SendToUser("/client-bot")
+    public LifecycleEventOutcome runBot(final LifecycleEvent lifecycleEvent) {
+        return robotMaster.runBot(lifecycleEvent);
     }
 }

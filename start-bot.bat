@@ -1,1 +1,1 @@
-start java -Dapp.home=C:\testing\mtgo-bot\ -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5006 -jar bot-client\target\bot-client-1.0.2.jar
+start java -Dhttps.protocols=TLSv1.1,TLSv1.2 -Dapp.home=C:\testing\mtgo-bot\ -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5006 -jar bot-client\target\bot-client-1.0.2.jar

@@ -1,7 +1,7 @@
-PASSWORD=master
+PASSWORD=orchestrator
 KEYSTORE=keystore.jks
 HOSTNAME=192.168.1.152
-CLIENTNAME=master
+CLIENTNAME=orchestrator
 
 # CN = Common Name
 # OU = Organization Unit
@@ -10,10 +10,10 @@ CLIENTNAME=master
 # ST = State Name
 # C  = Country (2-letter Country Code)
 # E  = Email
-DNAME_CA='CN=Atraxa CA,OU=atraxa.com,O=atraxa,L=Asgard,ST=AS,C=CC'
+DNAME_CA='CN=localhost CA,OU=localhost,O=localhost,L=Asgard,ST=AS,C=CC'
 # For server certificates, the Common Name (CN) must be the hostname
-DNAME_HOST='CN=$(HOSTNAME),OU=atraxa.com,O=atraxa,L=SomeCity,ST=SomeState,C=CC'
-DNAME_CLIENT='CN=$(CLIENTNAME),OU=atraxa.com,O=atraxa,L=SomeCity,ST=SomeState,C=CC'
+DNAME_HOST='CN=$(HOSTNAME),OU=localhost,O=localhost,L=SomeCity,ST=SomeState,C=CC'
+DNAME_CLIENT='CN=$(CLIENTNAME),OU=localhost,O=localhost,L=SomeCity,ST=SomeState,C=CC'
 TRUSTSTORE=truststore.jks
 
 all:	clean create-keystore add-host create-truststore add-client

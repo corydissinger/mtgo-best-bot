@@ -1,4 +1,4 @@
-package com.cd.bot.trigger;
+package com.cd.bot.orchestrator.trigger;
 
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;

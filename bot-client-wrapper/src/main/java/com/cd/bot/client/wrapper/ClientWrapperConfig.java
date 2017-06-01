@@ -1,30 +1,17 @@
 package com.cd.bot.client.wrapper;
 
-import com.cd.bot.wrapper.http.BotClientRestClient;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.StringMessageConverter;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.client.RestTemplate;
-
-import javax.net.ssl.*;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.*;
-import java.security.cert.CertificateException;
+import org.springframework.web.socket.client.WebSocketClient;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 @Configuration
-@EnableTransactionManagement
 @ComponentScan({ "com.cd.bot.client.wrapper" })
 @PropertySources({
         @PropertySource("classpath:client-wrapper-application.properties"),
@@ -35,58 +22,19 @@ public class ClientWrapperConfig {
     @Autowired
     private Environment environment;
 
-    @Bean(name = "httpClient")
-    public HttpClient httpClient() throws Exception {
-        return HttpClientBuilder.create().setSSLSocketFactory(sslSocketFactory())
-                .build();
+    @Bean
+    public WebSocketStompClient webSocketStompClient() {
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.afterPropertiesSet();
+        WebSocketClient webSocketClient = new StandardWebSocketClient();
+        WebSocketStompClient stompClient = new WebSocketStompClient(webSocketClient);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        stompClient.setTaskScheduler(taskScheduler); // for heartbeats
+        return stompClient;
     }
 
     @Bean
-    public SSLConnectionSocketFactory sslSocketFactory() {
-        final String keystoreLocation = environment.getRequiredProperty("keystore.location");
-        final String trustStoreLocation = environment.getRequiredProperty("trust.store.location");
-        final String keystorePassword = environment.getRequiredProperty("keystore.password");
-        final String trustStorePassword = environment.getRequiredProperty("trust.store.password");
-
-        try {
-            KeyStore clientStore = KeyStore.getInstance("JKS");
-            clientStore.load(new FileInputStream(keystoreLocation), keystorePassword.toCharArray());
-
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(clientStore, keystorePassword.toCharArray());
-
-            KeyStore trustStore = KeyStore.getInstance("JKS");
-            trustStore.load(new FileInputStream(trustStoreLocation), trustStorePassword.toCharArray());
-
-            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(
-                    new SSLContextBuilder()
-                            .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
-                            .loadKeyMaterial(clientStore, keystorePassword.toCharArray())
-                            .build(),
-                    NoopHostnameVerifier.INSTANCE);
-
-            return socketFactory;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public String botClientUrl() {
+        return environment.getRequiredProperty("bot.client.url");
     }
-
-
-    @Bean
-    public ClientHttpRequestFactory httpClientRequestFactory() throws Exception {
-        return new HttpComponentsClientHttpRequestFactory(httpClient());
-    }
-
-    @Bean(name = "clientRestTemplate")
-    public RestTemplate restTemplate() throws Exception {
-        return new RestTemplate(httpClientRequestFactory());
-    }
-
-    @Bean
-    public BotClientRestClient botCameraService() {
-        return new BotClientRestClient();
-    }
-
 }

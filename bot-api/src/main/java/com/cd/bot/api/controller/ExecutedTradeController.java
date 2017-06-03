@@ -2,22 +2,10 @@ package com.cd.bot.api.controller;
 
 import com.cd.bot.api.BotApiApplication;
 import com.cd.bot.api.service.ExecutedTradeService;
-import com.cd.bot.model.domain.ExecutedTrade;
-import com.cd.bot.model.domain.NpcTradeableCard;
-import com.cd.bot.model.domain.OwnedTradeableCard;
-import com.cd.bot.model.domain.SellOrder;
-import com.cd.bot.model.domain.repository.ExecutedTradeRepository;
-import com.cd.bot.model.domain.repository.NpcBotRepository;
-import com.cd.bot.model.domain.repository.OwnedTradeableCardRepository;
-import com.cd.bot.model.domain.repository.PlayerBotRepository;
+import com.cd.bot.model.domain.trade.ExecutedTrade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by Cory on 5/22/2017.

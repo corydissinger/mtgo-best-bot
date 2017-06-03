@@ -9,7 +9,6 @@
         <module name="bot-api" />
         <module name="bot-api-wrapper" />
         <module name="bot-client" />
-        <module name="bot-client-model" />
         <module name="bot-client-wrapper" />
         <module name="bot-model" />
         <module name="bot-orchestrator" />

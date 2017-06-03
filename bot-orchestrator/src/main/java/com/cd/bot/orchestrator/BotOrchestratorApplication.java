@@ -1,14 +1,16 @@
 package com.cd.bot.orchestrator;
 
-import com.cd.bot.client.model.AssumedScreenTest;
-import com.cd.bot.client.model.LifecycleEvent;
-import com.cd.bot.client.model.LifecycleEventOutcome;
-import com.cd.bot.client.model.ProcessingLifecycleStatus;
 import com.cd.bot.client.wrapper.ClientWrapperConfig;
+import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
+import com.cd.bot.model.domain.repository.LifecycleEventRepository;
+import com.cd.bot.orchestrator.kafka.LifecycleEventSender;
 import com.cd.bot.orchestrator.service.BotClientService;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,14 +19,18 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.*;
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Cory on 5/16/2017.
@@ -44,6 +50,7 @@ import java.util.function.Consumer;
 public class BotOrchestratorApplication {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(BotOrchestratorApplication.class);
+    private static final String BOT_TOPIC = "bot"; //kektus
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(BotOrchestratorApplication.class);
@@ -63,9 +70,43 @@ public class BotOrchestratorApplication {
     @Autowired
     private BotCameraRepository botCameraRepository;
 
+    @Autowired
+    private LifecycleEventRepository lifecycleEventRepository;
+
+    @Value("${kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
     @Bean
-    public ConcurrentLinkedQueue<LifecycleEvent> eventQueue() {
-        return new ConcurrentLinkedQueue<>();
+    public Map<String, Object> producerConfigs() {
+        Map<String, Object> props = new HashMap<>();
+        // list of host:port pairs used for establishing the initial connections to the Kakfa cluster
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
+        return props;
+    }
+
+    @Bean
+    public ProducerFactory<String, Object> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }
+
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public LifecycleEventSender lifecycleEventSender() {
+        return new LifecycleEventSender();
+    }
+
+    @Scheduled(fixedDelay = 5000)
+    public void doWork() {
+        LifecycleEvent event = lifecycleEventRepository.findByOrderByTimeExecutedDesc();
+
+        lifecycleEventSender().send(BOT_TOPIC, event);
     }
 
     @Scheduled(fixedRate = 60000)
@@ -74,27 +115,6 @@ public class BotOrchestratorApplication {
         cal.add(Calendar.HOUR, -1);
         Date oneHourBack = cal.getTime();
         botCameraRepository.deleteOlderThan(oneHourBack);
+        lifecycleEventRepository.deleteOlderThan(oneHourBack);
     }
-
-    @Scheduled(fixedDelay = 5000)
-    public void doWork() {
-        final ConcurrentLinkedQueue<LifecycleEvent> eventQueue = eventQueue();
-
-        if(eventQueue.isEmpty()) {
-            eventQueue.add(new LifecycleEvent(AssumedScreenTest.NOT_NEEDED, ProcessingLifecycleStatus.APPLICATION_START));
-        }
-
-        Consumer<LifecycleEventOutcome> outcomeConsumer = outcome -> {
-            final ProcessingLifecycleStatus outcomeStatus = outcome.getProcessingLifecycleStatus();
-
-            switch (outcomeStatus) {
-                case UNKNOWN:
-                    eventQueue.add(new LifecycleEvent(AssumedScreenTest.LOGIN, ProcessingLifecycleStatus.LOGIN_READY));
-                    break;
-            }
-        };
-
-        botClientService.pushEvent(eventQueue.remove(), outcomeConsumer);
-    }
-
 }

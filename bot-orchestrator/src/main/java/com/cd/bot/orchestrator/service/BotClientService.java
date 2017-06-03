@@ -1,7 +1,7 @@
 package com.cd.bot.orchestrator.service;
 
-import com.cd.bot.client.model.LifecycleEvent;
-import com.cd.bot.client.model.LifecycleEventOutcome;
+import com.cd.bot.model.domain.bot.LifecycleEvent;
+import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
 import com.cd.bot.client.wrapper.ws.BotWebSocketClient;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
 import org.apache.commons.lang3.ArrayUtils;

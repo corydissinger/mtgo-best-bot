@@ -1,5 +1,7 @@
 package com.cd.bot.model.domain;
 
+import com.cd.bot.model.domain.trade.ExecutedTrade;
+import com.cd.bot.model.domain.trade.OwnedTradeableCard;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
 

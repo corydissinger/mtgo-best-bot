@@ -2,6 +2,7 @@ package com.cd.bot.api.service;
 
 import com.cd.bot.model.domain.*;
 import com.cd.bot.model.domain.repository.*;
+import com.cd.bot.model.domain.trade.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

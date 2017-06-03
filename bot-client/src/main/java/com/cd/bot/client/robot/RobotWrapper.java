@@ -1,10 +1,9 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.client.config.BotConfig;
-import com.cd.bot.client.model.AssumedScreenTest;
-import com.cd.bot.client.model.LifecycleEventOutcome;
-import com.cd.bot.client.model.ProcessingLifecycleStatus;
-import com.cd.bot.client.model.exception.ApplicationDownException;
+import com.cd.bot.model.domain.bot.AssumedScreenTest;
+import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
+import com.cd.bot.model.domain.bot.ProcessingLifecycleStatus;
+import com.cd.bot.model.domain.bot.exception.ApplicationDownException;
 import com.cd.bot.client.system.ProcessManager;
 import com.cd.bot.client.tesseract.RawLines;
 import com.cd.bot.client.tesseract.RawLinesProcessor;

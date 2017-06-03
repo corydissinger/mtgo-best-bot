@@ -1,6 +1,6 @@
 package com.cd.bot.client.tesseract;
 
-import com.cd.bot.client.model.ProcessingLifecycleStatus;
+import com.cd.bot.model.domain.bot.ProcessingLifecycleStatus;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;

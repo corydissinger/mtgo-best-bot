@@ -1,5 +1,6 @@
 package com.cd.bot.client.config;
 
+import com.cd.bot.client.kafka.RobotLifecycleReceiver;
 import com.cd.bot.client.robot.RobotMaster;
 import com.cd.bot.client.robot.RobotWrapper;
 import com.cd.bot.client.system.ProcessManager;
@@ -7,9 +8,12 @@ import com.cd.bot.client.tesseract.ImagePreProcessor;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
 import net.sourceforge.tess4j.TessAPI1;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -18,13 +22,17 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Cory on 5/11/2017.
@@ -36,9 +44,9 @@ import java.awt.*;
     @PropertySource("classpath:client-application.properties"),
     @PropertySource("file:${app.home}/client-application.properties") //wins
 })
+@EnableKafka
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class, WebMvcAutoConfiguration.class })
-@EnableWebSocketMessageBroker
-public class BotConfig extends AbstractWebSocketMessageBrokerConfigurer {
+public class BotConfig {
 
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
 
@@ -52,16 +60,50 @@ public class BotConfig extends AbstractWebSocketMessageBrokerConfigurer {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/client-bot");
+    // ------------------- START KAFKA
+    // ------------------- START KAFKA
+    // ------------------- START KAFKA
+    
+    
+    @Value("${kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
+    @Bean
+    public Map<String, Object> consumerConfigs() {
+        Map<String, Object> props = new HashMap<>();
+        // list of host:port pairs used for establishing the initial connections to the Kakfa cluster
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        // allows a pool of processes to divide the work of consuming and processing records
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "bot");
+
+        return props;
     }
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket").withSockJS();
+    @Bean
+    public ConsumerFactory<String, String> consumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+
+        return factory;
+    }
+
+    @Bean
+    public RobotLifecycleReceiver robotLifecycleReceiver() {
+        return new RobotLifecycleReceiver();
+    }
+
+    // ------------------- END KAFKA
+    // ------------------- END KAFKA
+    // ------------------- END KAFKA    
+    
     @Bean
     public Robot robot() {
         Robot theRobot = null;

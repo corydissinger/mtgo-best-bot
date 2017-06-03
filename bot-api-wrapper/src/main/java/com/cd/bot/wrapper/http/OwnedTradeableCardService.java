@@ -1,14 +1,11 @@
 package com.cd.bot.wrapper.http;
 
-import com.cd.bot.api.controller.BotController;
 import com.cd.bot.api.controller.OwnedTradeableCardController;
-import com.cd.bot.model.domain.OwnedTradeableCard;
-import com.cd.bot.model.domain.PlayerBot;
+import com.cd.bot.model.domain.trade.OwnedTradeableCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;

@@ -5,10 +5,10 @@
       <module fileurl="file://$PROJECT_DIR$/bot-api/bot-api.iml" filepath="$PROJECT_DIR$/bot-api/bot-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/bot-api-wrapper/bot-api-wrapper.iml" filepath="$PROJECT_DIR$/bot-api-wrapper/bot-api-wrapper.iml" />
       <module fileurl="file://$PROJECT_DIR$/bot-client/bot-client.iml" filepath="$PROJECT_DIR$/bot-client/bot-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bot-client-model/bot-client-model.iml" filepath="$PROJECT_DIR$/bot-client-model/bot-client-model.iml" />
       <module fileurl="file://$PROJECT_DIR$/bot-client-wrapper/bot-client-wrapper.iml" filepath="$PROJECT_DIR$/bot-client-wrapper/bot-client-wrapper.iml" />
       <module fileurl="file://$PROJECT_DIR$/bot-model/bot-model.iml" filepath="$PROJECT_DIR$/bot-model/bot-model.iml" />
       <module fileurl="file://$PROJECT_DIR$/bot-orchestrator/bot-orchestrator.iml" filepath="$PROJECT_DIR$/bot-orchestrator/bot-orchestrator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bot-ui/bot-ui.iml" filepath="$PROJECT_DIR$/bot-ui/bot-ui.iml" />
       <module fileurl="file://$PROJECT_DIR$/mtgo-best-bot.iml" filepath="$PROJECT_DIR$/mtgo-best-bot.iml" />
     </modules>
   </component>

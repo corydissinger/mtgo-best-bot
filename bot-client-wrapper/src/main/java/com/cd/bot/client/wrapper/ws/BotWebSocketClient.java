@@ -1,7 +1,7 @@
 package com.cd.bot.client.wrapper.ws;
 
-import com.cd.bot.client.model.LifecycleEvent;
-import com.cd.bot.client.model.LifecycleEventOutcome;
+import com.cd.bot.model.domain.bot.LifecycleEvent;
+import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

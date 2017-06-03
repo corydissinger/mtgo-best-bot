@@ -1,6 +1,6 @@
 package com.cd.bot.model.domain.repository;
 
-import com.cd.bot.model.domain.ExecutedTrade;
+import com.cd.bot.model.domain.trade.ExecutedTrade;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

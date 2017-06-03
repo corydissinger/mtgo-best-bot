@@ -1,6 +1,6 @@
 package com.cd.bot.client.tesseract;
 
-import com.cd.bot.client.model.tesseract.TesseractRectangle;
+import com.cd.bot.model.domain.bot.tesseract.TesseractRectangle;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 

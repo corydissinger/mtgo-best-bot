@@ -1,14 +1,13 @@
 package com.cd.bot.api.controller;
 
 import com.cd.bot.api.BotApiApplication;
-import com.cd.bot.model.domain.Card;
-import com.cd.bot.model.domain.OwnedTradeableCard;
+import com.cd.bot.model.domain.trade.Card;
+import com.cd.bot.model.domain.trade.OwnedTradeableCard;
 import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.repository.CardRepository;
 import com.cd.bot.model.domain.repository.OwnedTradeableCardRepository;
 import com.cd.bot.model.domain.repository.PlayerBotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

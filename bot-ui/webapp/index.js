@@ -15,11 +15,16 @@ store = createStore(
     middleware
 );
 
+//End boilerplate
+//Components
+
+import Main from './components/Main';
+
 ReactDOM.render(
     <Provider store={ store }>
         <div style={{ height: '100%' }}>
             <Router history={browserHistory}>
-                <Route path="/" component={Main}/>
+                <Route path="/" exact component={Main}/>
                 <Route path="/bots" component={Bots}/>
                 <Route path="/trades" component={Trades}/>
             </Router>

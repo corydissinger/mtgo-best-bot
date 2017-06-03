@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -46,10 +47,8 @@ import javax.servlet.MultipartConfigElement;
         @PropertySource("classpath:api-application.properties"),
         @PropertySource("file:${app.home}/api-application.properties") //wins
 })
-@Import(ClientWrapperConfig.class)
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class BotApiApplication extends WebSecurityConfigurerAdapter {
+@Import({ClientWrapperConfig.class, BotApiSecurityConfig.class})
+public class BotApiApplication extends WebMvcConfigurerAdapter {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(BotApiApplication.class, args);
     }
@@ -63,6 +62,14 @@ public class BotApiApplication extends WebSecurityConfigurerAdapter {
     @Bean
     public String botClientUrl() {
         return environment.getRequiredProperty("bot.client.url"); //Needs to be smarter
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        if (!registry.hasMappingForPattern("/webjars/**")) {
+            registry.addResourceHandler("/webjars/**").addResourceLocations(
+                    "classpath:/META-INF/resources/webjars/");
+        }
     }
 
     @Bean
@@ -81,31 +88,6 @@ public class BotApiApplication extends WebSecurityConfigurerAdapter {
         return new ApiInfoBuilder()
                 .description("Control the MTGO bots")
                 .build();
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests().anyRequest().authenticated()
-                .and()
-                .x509()
-                .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
-                .userDetailsService(userDetailsService());
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String username) {
-                if (username.equals("orchestrator")) {
-                    return new User(username, "",
-                            AuthorityUtils
-                                    .commaSeparatedStringToAuthorityList(ROLE_ORCHESTRATOR));
-                }
-                return null;
-            }
-        };
     }
 
 }

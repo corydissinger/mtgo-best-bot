@@ -1,11 +1,29 @@
-var greeter = require('./greeter');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Router, Route, Switch, browserHistory } from 'react-router'
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, compose } from 'redux';
+import thunk from 'redux-thunk';
+import 'babel-polyfill';
 
-var greeting = greeter.greet();
+import rootReducer from './redux/reducers';
 
-if (typeof document !== 'undefined') {
-  var el = document.createElement('h1');
-  el.innerHTML = greeting;
-  document.body.appendChild(el);
-} else {
-  console.log(greeting);
-}
+const middleware = applyMiddleware(thunk);
+
+store = createStore(
+    rootReducer,
+    middleware
+);
+
+ReactDOM.render(
+    <Provider store={ store }>
+        <div style={{ height: '100%' }}>
+            <Router history={browserHistory}>
+                <Route path="/" component={Main}/>
+                <Route path="/bots" component={Bots}/>
+                <Route path="/trades" component={Trades}/>
+            </Router>
+       </div>
+    </Provider>,
+    document.getElementById('root')
+);

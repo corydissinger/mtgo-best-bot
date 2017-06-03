@@ -37,5 +37,8 @@ module.exports = {
     filename: 'app-bundle.js'
   },
 
-  plugins: [new HtmlWebpackPlugin()]
+  plugins: [new HtmlWebpackPlugin({
+    title: 'Good shits',
+    template: 'index.ejs',
+  })]
 };

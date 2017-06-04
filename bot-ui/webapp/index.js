@@ -18,7 +18,8 @@ const store = createStore(reducer, applyMiddleware(
 
 import Main from './components/Main';
 import BotsContainer from './containers/BotsContainer';
-import {TradesContainer} from './containers/TradesContainer';
+import TradesContainer from './containers/TradesContainer';
+import PlayerBotDetailsContainer from './containers/PlayerBotDetailsContainer';
 
 ReactDOM.render(
   <Provider store={store}>
@@ -26,6 +27,7 @@ ReactDOM.render(
         <Router history={browserHistory}>
             <Route path="/" exact component={Main}/>
             <Route path="/bots" component={BotsContainer}/>
+            <Route path="/bot/:botName" component={PlayerBotDetailsContainer}/>
             <Route path="/trades" component={TradesContainer}/>
         </Router>
      </div>

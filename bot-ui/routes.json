@@ -1,3 +1,4 @@
 {
-  "/api/bot": "/bot"
+  "/api/bot": "/bot",
+  "/bot/details/baronvonfonz": "/botDetails"
 }

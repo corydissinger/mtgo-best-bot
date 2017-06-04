@@ -1,7 +1,9 @@
 package com.cd.bot.api.controller;
 
 import com.cd.bot.api.BotApiApplication;
+import com.cd.bot.model.domain.bot.AssumedScreenTest;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
+import com.cd.bot.model.domain.bot.ProcessingLifecycleStatus;
 import com.cd.bot.model.domain.repository.LifecycleEventRepository;
 import com.cd.bot.model.domain.repository.PlayerBotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,18 @@ public class LifecycleEventController {
 
     @Autowired
     private LifecycleEventRepository lifecycleEventRepository;
+
+    @RequestMapping(value = ENDPOINT_ROOT + "/screen-test", method = RequestMethod.GET)
+    @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
+    private AssumedScreenTest[] getScreenTestEnums() {
+        return AssumedScreenTest.values();
+    }
+
+    @RequestMapping(value = ENDPOINT_ROOT + "/lifecycle-status", method = RequestMethod.GET)
+    @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
+    private ProcessingLifecycleStatus[] getLifecycleStatus() {
+        return ProcessingLifecycleStatus.values();
+    }
 
     @RequestMapping(value = ENDPOINT_ROOT, method = RequestMethod.GET)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)

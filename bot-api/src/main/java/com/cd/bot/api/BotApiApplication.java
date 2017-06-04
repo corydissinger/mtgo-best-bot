@@ -66,7 +66,11 @@ public class BotApiApplication extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations(
+        registry.addResourceHandler("/**.html").addResourceLocations(
+                "classpath:/META-INF/resources/webjars/bot-ui/1.0.2/");
+        registry.addResourceHandler("/**.js").addResourceLocations(
+                "classpath:/META-INF/resources/webjars/bot-ui/1.0.2/");
+        registry.addResourceHandler("/**.css").addResourceLocations(
                 "classpath:/META-INF/resources/webjars/bot-ui/1.0.2/");
     }
 

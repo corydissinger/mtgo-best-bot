@@ -23,6 +23,18 @@ const rules = [
 module.exports = {
   context: jsSourcePath,
 
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8443/',
+        secure: false,
+        changeOrigin: true
+      }
+    }
+  },
+
+  devtool: "#inline-source-map",
+
   module: {
     rules
   },

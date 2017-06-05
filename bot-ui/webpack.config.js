@@ -44,13 +44,13 @@ module.exports = {
   },
 
   output: {
-    path: PATHS.build,
+    path: PATHS.build + "/app/",
     publicPath: '/',
     filename: 'app-bundle.js'
   },
 
   plugins: [new HtmlWebpackPlugin({
-    title: 'Good shits',
     template: 'index.ejs',
+    filename: 'index.html'
   })]
 };

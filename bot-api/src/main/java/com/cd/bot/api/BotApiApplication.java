@@ -76,7 +76,7 @@ public class BotApiApplication extends WebMvcConfigurerAdapter {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         if (!registry.hasMappingForPattern("/app/**")) {
             registry.addResourceHandler("/app/**").addResourceLocations(
-                    "classpath:/META-INF/resources/webjars/bot-ui/1.0.2/");
+                    "classpath:/META-INF/resources/webjars/bot-ui/1.0.2/app/");
         }
     }
 

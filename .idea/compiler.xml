@@ -12,6 +12,7 @@
         <module name="bot-client-wrapper" />
         <module name="bot-model" />
         <module name="bot-orchestrator" />
+        <module name="bot-ui" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -23,6 +24,7 @@
       <module name="bot-model" target="1.8" />
       <module name="bot-orchestrator" target="1.8" />
       <module name="bot-standalone" target="1.8" />
+      <module name="bot-ui" target="1.6" />
       <module name="mtgo-best-bot" target="1.6" />
     </bytecodeTargetLevel>
   </component>

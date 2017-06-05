@@ -1,3 +1,5 @@
+require('dotenv').config();
+var isProduction = process.env.production === 'true';
 var packageJSON = require('./package.json');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -33,7 +35,7 @@ module.exports = {
     }
   },
 
-  devtool: "#inline-source-map",
+  devtool: isProduction ? "" : "#inline-source-map",
 
   module: {
     rules
@@ -44,13 +46,13 @@ module.exports = {
   },
 
   output: {
-    path: PATHS.build + "/app/",
-    publicPath: '/',
-    filename: 'app-bundle.js'
+    path: PATHS.build,
+    publicPath: isProduction ? '/app' : '/',
+    filename: 'js/app-bundle.js'
   },
 
   plugins: [new HtmlWebpackPlugin({
     template: 'index.ejs',
-    filename: 'index.html'
+    filename: './index.html'
   })]
 };

@@ -48,7 +48,7 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>run build</arguments>
+                            <arguments>run build --env.production=true</arguments>
                         </configuration>
                     </execution>
 

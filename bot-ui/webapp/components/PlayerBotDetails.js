@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router';
+import {Link} from 'react-router-dom';
 import * as _ from 'lodash';
 
 export default class PlayerBotDetails extends React.Component {

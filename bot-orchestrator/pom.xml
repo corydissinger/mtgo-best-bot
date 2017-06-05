@@ -69,7 +69,7 @@
 				<configuration>
 					<classifier>exec</classifier>
 					<excludeGroupIds>io.springfox, io.swagger, org.thymeleaf</excludeGroupIds>
-					<excludeArtifactIds>bot-api</excludeArtifactIds>
+					<excludeArtifactIds>bot-api, tess4j</excludeArtifactIds>
 				</configuration>
 			</plugin>
 		</plugins>

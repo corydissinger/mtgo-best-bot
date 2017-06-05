@@ -17,6 +17,7 @@ import java.util.List;
  * Created by Cory on 5/16/2017.
  */
 @RestController
+@RequestMapping("/api")
 public class BotController {
 
     public static final String ENDPOINT_ROOT = "/bot";
@@ -32,7 +33,7 @@ public class BotController {
 
     @RequestMapping(value = ENDPOINT_ROOT, method = RequestMethod.GET)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
-    private List<PlayerBot> get() {
+    public List<PlayerBot> get() {
         List<PlayerBot> playerBots = new ArrayList<>();
         playerBotRepository.findAll().forEach(playerBots::add);
         return playerBots;
@@ -40,19 +41,19 @@ public class BotController {
 
     @RequestMapping(value = ENDPOINT_ROOT + "/{id}", method = RequestMethod.GET)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
-    private PlayerBot get(@PathVariable final String id) {
+    public PlayerBot get(@PathVariable final String id) {
         return playerBotRepository.findOne(Long.parseLong(id));
     }
 
     @RequestMapping(value = ENDPOINT_ROOT + "/name/{name}", method = RequestMethod.GET)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
-    private PlayerBot getByName(@PathVariable final String name) {
+    public PlayerBot getByName(@PathVariable final String name) {
         return playerBotRepository.findByName(name);
     }
 
     @RequestMapping(value = ENDPOINT_ROOT + "/details/{name}", method = RequestMethod.GET)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
-    private PlayerBot details(@PathVariable final String name) {
+    public PlayerBot details(@PathVariable final String name) {
         PlayerBot playerBot = playerBotRepository.findByName(name);
 
         playerBot.setBotCameras(botCameraRepository.findByPlayerBot(playerBot));
@@ -63,7 +64,7 @@ public class BotController {
 
     @RequestMapping(value = ENDPOINT_ROOT, method = RequestMethod.POST)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
-    private ResponseEntity<Void> save(@RequestBody final PlayerBot newPlayerBot) {
+    public ResponseEntity<Void> save(@RequestBody final PlayerBot newPlayerBot) {
         playerBotRepository.save(newPlayerBot);
 
         return ResponseEntity.ok(null);

@@ -5,7 +5,6 @@ import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
 import com.cd.bot.model.domain.repository.LifecycleEventRepository;
 import com.cd.bot.orchestrator.kafka.LifecycleEventSender;
-import com.cd.bot.orchestrator.service.BotClientService;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,7 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -46,7 +46,7 @@ import java.util.Map;
         @PropertySource("classpath:orchestrator-application.properties"),
         @PropertySource("file:${app.home}/orchestrator-application.properties") //wins
 })
-@Import(ClientWrapperConfig.class)
+@EnableKafka
 public class BotOrchestratorApplication {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(BotOrchestratorApplication.class);
@@ -64,9 +64,6 @@ public class BotOrchestratorApplication {
     //TODO -  - - - Do not forget, the pre sell tumbler
     //TODO
     //TODO
-    @Autowired
-    private BotClientService botClientService;
-
     @Autowired
     private BotCameraRepository botCameraRepository;
 

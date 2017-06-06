@@ -14,20 +14,16 @@ import java.util.List;
 @Entity
 @JsonIgnoreProperties({"botCameras", "botStatuses"})
 public class PlayerBot extends Bot {
-    @ApiModelProperty(hidden = true)
-    @OneToMany(mappedBy = "playerBot")
+    @OneToMany(mappedBy = "playerBot", fetch = FetchType.LAZY)
     private List<BotStatus> botStatuses;
 
-    @ApiModelProperty(hidden = true)
-    @OneToMany(mappedBy = "playerBot")
+    @OneToMany(mappedBy = "playerBot", fetch = FetchType.LAZY)
     private List<BotCamera> botCameras;
 
-    @ApiModelProperty(hidden = true)
-    @OneToMany(mappedBy = "playerBot")
+    @OneToMany(mappedBy = "playerBot", fetch = FetchType.LAZY)
     private List<OwnedTradeableCard> botCards;
 
-    @ApiModelProperty(hidden = true)
-    @OneToMany(mappedBy = "playerBot")
+    @OneToMany(mappedBy = "playerBot", fetch = FetchType.LAZY)
     private List<ExecutedTrade> executedTrades;
 
     protected PlayerBot() { }

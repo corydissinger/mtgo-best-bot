@@ -18,6 +18,7 @@ import java.util.List;
  * Created by Cory on 5/20/2017.
  */
 @RestController
+@RequestMapping("/api")
 public class OwnedTradeableCardController {
 
     public static final String ENDPOINT_ROOT = "/ownedcards";

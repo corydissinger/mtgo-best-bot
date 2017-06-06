@@ -18,11 +18,12 @@ import java.util.List;
  * Created by Cory on 6/2/2017.
  */
 @RestController
+@RequestMapping("/api")
 public class LifecycleEventController {
     public static final String ENDPOINT_ROOT = "/event";
 
     @Autowired
-    private LifecycleEventRepository lifecycleEventRepository;
+    LifecycleEventRepository lifecycleEventRepository;
 
     @RequestMapping(value = ENDPOINT_ROOT + "/screen-test", method = RequestMethod.GET)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)

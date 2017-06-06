@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by Cory on 5/15/2017.
  */
-@RestController(value = "/botstatus")
+@RestController(value = "/api/botstatus")
 public class BotStatusController {
 
     @Autowired

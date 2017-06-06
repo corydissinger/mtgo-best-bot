@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by Cory on 5/22/2017.
  */
 @RestController
+@RequestMapping("/api")
 public class ExecutedTradeController {
 
     public static final String ENDPOINT_ROOT = "/trades";

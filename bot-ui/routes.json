@@ -1,4 +1,6 @@
 {
   "/api/bot": "/bot",
-  "/bot/details/baronvonfonz": "/botDetails"
+  "/bot/details/baronvonfonz": "/botDetails",
+  "/api/event/lifecycle-status": "/lifecycleStatuses",
+  "/api/event/screen-test": "/screenTests"
 }

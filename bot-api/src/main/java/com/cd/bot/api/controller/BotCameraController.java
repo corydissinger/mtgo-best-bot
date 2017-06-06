@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  * Created by Cory on 5/15/2017.
  */
 @Controller
+@RequestMapping("/api")
 public class BotCameraController {
 
     public static final String BOT_CAMERA_RECENT = "/botcamera/recent/{name}";

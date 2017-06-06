@@ -11,5 +11,7 @@
         "name": "baronvonfonz",
         "botCameras": [ { "timeTaken": "now" } ],
         "botCards": [ { "price": 0.001, "card": { "name": "test"}, "quantity": 5 } ]
-      }
+      },
+    "lifecycleStatuses": ["UNKNOWN","AWAIT_APPLICATION_READY","APPLICATION_DOWN","APPLICATION_READY","TRADE_PARTNER","ACCEPT_TOS_EULA_READY","LOGIN_READY","LOGGING_IN","ABORT_LIFE","APPLICATION_START"],
+    "screenTests": ["NOT_NEEDED","LOGIN","HOME_PAGE","COLLECTION_BOUNDS","TRADE","EULA"]
 }

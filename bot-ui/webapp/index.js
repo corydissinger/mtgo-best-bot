@@ -30,7 +30,7 @@ const store = createStore(reducer, applyMiddleware(
 //End boilerplate
 //Components
 
-import Main from './components/Main';
+import MainContainer from './containers/MainContainer';
 import BotsContainer from './containers/BotsContainer';
 import TradesContainer from './containers/TradesContainer';
 import PlayerBotDetailsContainer from './containers/PlayerBotDetailsContainer';
@@ -43,7 +43,7 @@ ReactDOM.render(
                 <Route path="/bot/:botName" component={PlayerBotDetailsContainer}/>
                 <Route path="/trades" component={TradesContainer}/>
                 <hr />
-                <Route component={Main} />
+                <Route component={MainContainer} />
             </div>
         </Router>
   </Provider>,

@@ -7,6 +7,7 @@ import com.cd.bot.client.system.ProcessManager;
 import com.cd.bot.client.tesseract.ImagePreProcessor;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
+import com.cd.bot.model.domain.bot.LifecycleEvent;
 import net.sourceforge.tess4j.TessAPI1;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -26,6 +27,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -45,7 +47,7 @@ import java.util.Map;
     @PropertySource("file:${app.home}/client-application.properties") //wins
 })
 @EnableKafka
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class, WebMvcAutoConfiguration.class })
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, WebMvcAutoConfiguration.class })
 public class BotConfig {
 
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
@@ -66,7 +68,7 @@ public class BotConfig {
     
     
     @Value("${kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    public String bootstrapServers;
 
     @Bean
     public Map<String, Object> consumerConfigs() {
@@ -74,7 +76,7 @@ public class BotConfig {
         // list of host:port pairs used for establishing the initial connections to the Kakfa cluster
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         // allows a pool of processes to divide the work of consuming and processing records
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "bot");
 
@@ -82,13 +84,13 @@ public class BotConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+    public ConsumerFactory<String, LifecycleEvent> consumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(), new JsonDeserializer<>(LifecycleEvent.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, LifecycleEvent> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, LifecycleEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
 

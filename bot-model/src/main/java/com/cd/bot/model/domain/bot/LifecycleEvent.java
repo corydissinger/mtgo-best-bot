@@ -19,7 +19,7 @@ public class LifecycleEvent implements Serializable {
     private AssumedScreenTest assumedScreenTest;
     private ProcessingLifecycleStatus processingLifecycleStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="bot_id")
     private PlayerBot playerBot;    
     

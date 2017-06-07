@@ -4,7 +4,10 @@ import com.cd.bot.client.wrapper.ClientWrapperConfig;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
 import com.cd.bot.model.domain.repository.LifecycleEventRepository;
+import com.cd.bot.model.domain.repository.PlayerBotRepository;
 import com.cd.bot.orchestrator.kafka.LifecycleEventSender;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.LoggerFactory;
@@ -46,7 +49,6 @@ import java.util.Map;
         @PropertySource("classpath:orchestrator-application.properties"),
         @PropertySource("file:${app.home}/orchestrator-application.properties") //wins
 })
-@EnableKafka
 public class BotOrchestratorApplication {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(BotOrchestratorApplication.class);
@@ -65,10 +67,13 @@ public class BotOrchestratorApplication {
     //TODO
     //TODO
     @Autowired
-    private BotCameraRepository botCameraRepository;
+    BotCameraRepository botCameraRepository;
 
     @Autowired
-    private LifecycleEventRepository lifecycleEventRepository;
+    LifecycleEventRepository lifecycleEventRepository;
+
+    @Autowired
+    PlayerBotRepository playerBotRepository;
 
     @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -86,7 +91,14 @@ public class BotOrchestratorApplication {
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
+        DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(producerConfigs());
+        factory.setValueSerializer(lifecycleEventSerializer());
+        return factory;
+    }
+
+    @Bean
+    public JsonSerializer lifecycleEventSerializer() {
+        return new JsonSerializer<>(objectMapper());
     }
 
     @Bean
@@ -102,8 +114,21 @@ public class BotOrchestratorApplication {
     @Scheduled(fixedDelay = 5000)
     public void doWork() {
         LifecycleEvent event = lifecycleEventRepository.findByOrderByTimeExecutedDesc();
+        event.getPlayerBot();
 
         lifecycleEventSender().send(BOT_TOPIC, event);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new HibernateAwareObjectMapper();
+    }
+
+    class HibernateAwareObjectMapper extends ObjectMapper {
+
+        public HibernateAwareObjectMapper() {
+            registerModule(new Hibernate5Module());
+        }
     }
 
     @Scheduled(fixedRate = 60000)

@@ -2,6 +2,7 @@ require('dotenv').config();
 var isProduction = process.env.production === 'true';
 var packageJSON = require('./package.json');
 var path = require('path');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var webpack = require('webpack');
 
@@ -20,6 +21,19 @@ const rules = [
       'babel-loader',
     ],
   },
+  {
+    test: /\.(css)$/,
+    loader: ExtractTextPlugin.extract({
+        use: 'css-loader'
+    })
+  },
+  {
+    test: /\.(eot|ttf|woff|woff2|svg)(\?v=\d+\.\d+)?$/,
+    loader: "file-loader",
+    options: {
+        name: 'fonts/[name].[ext]'
+    }
+  }
 ]
 
 module.exports = {
@@ -54,5 +68,7 @@ module.exports = {
   plugins: [new HtmlWebpackPlugin({
     template: 'index.ejs',
     filename: './index.html'
-  })]
+  }),
+  new ExtractTextPlugin('[name].css')
+  ]
 };

@@ -1,5 +1,6 @@
 package com.cd.bot.model.domain.repository;
 
+import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,5 +20,7 @@ public interface LifecycleEventRepository extends JpaRepository<LifecycleEvent, 
     @Query("delete from LifecycleEvent le where le.timeExecuted < ?1")
     void deleteOlderThan(Date timeExecuted);
 
-    LifecycleEvent findByOrderByTimeExecutedDesc();
+    LifecycleEvent findByOrderByTimeRequestedDesc();
+
+    LifecycleEvent findByPlayerBotOrderByTimeRequestedDesc(PlayerBot playerBot);
 }

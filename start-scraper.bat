@@ -1,0 +1,1 @@
+java -Dapp.home=C:\testing\mtgo-bot\ -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -jar bot-wikiprice-scraper\target\bot-wikiprice-scraper-1.0.2.jar

@@ -1,6 +1,5 @@
 package com.cd.bot.orchestrator;
 
-import com.cd.bot.client.wrapper.ClientWrapperConfig;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
 import com.cd.bot.model.domain.repository.LifecycleEventRepository;
@@ -21,7 +20,6 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -113,7 +111,7 @@ public class BotOrchestratorApplication {
 
     @Scheduled(fixedDelay = 5000)
     public void doWork() {
-        LifecycleEvent event = lifecycleEventRepository.findByOrderByTimeExecutedDesc();
+        LifecycleEvent event = lifecycleEventRepository.findByOrderByTimeRequestedDesc();
         event.getPlayerBot();
 
         lifecycleEventSender().send(BOT_TOPIC, event);

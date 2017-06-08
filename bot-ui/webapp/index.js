@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import { createLogger } from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
 import reducer from './reducers';
+import 'bootstrap/dist/css/bootstrap.css';
 
 console.log("App started");
 

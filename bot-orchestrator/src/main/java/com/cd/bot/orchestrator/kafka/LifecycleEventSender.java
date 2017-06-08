@@ -37,7 +37,5 @@ public class LifecycleEventSender {
                 LOGGER.error("unable to send message='{}'", message, ex);
             }
         });
-
-        // or, to block the sending thread to await the result, invoke the future's get() method
     }
 }

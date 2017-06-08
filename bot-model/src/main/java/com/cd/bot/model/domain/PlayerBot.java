@@ -14,8 +14,8 @@ import java.util.List;
 @Entity
 @JsonIgnoreProperties({"botCameras", "botStatuses"})
 public class PlayerBot extends Bot {
-    @OneToMany(mappedBy = "playerBot", fetch = FetchType.LAZY)
-    private List<BotStatus> botStatuses;
+    @Transient
+    private String status;
 
     @OneToMany(mappedBy = "playerBot", fetch = FetchType.LAZY)
     private List<BotCamera> botCameras;
@@ -56,14 +56,6 @@ public class PlayerBot extends Bot {
         this.botCameras = botCameras;
     }
 
-    public List<BotStatus> getBotStatuses() {
-        return botStatuses;
-    }
-
-    public void setBotStatuses(List<BotStatus> botStatuses) {
-        this.botStatuses = botStatuses;
-    }
-
     public List<OwnedTradeableCard> getBotCards() {
         return botCards;
     }
@@ -78,5 +70,13 @@ public class PlayerBot extends Bot {
 
     public void setExecutedTrades(List<ExecutedTrade> executedTrades) {
         this.executedTrades = executedTrades;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

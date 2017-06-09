@@ -9,6 +9,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/bot-client-model/pom.xml" />
+        <option value="$PROJECT_DIR$/bot-client-wrapper/pom.xml" />
       </set>
     </option>
   </component>

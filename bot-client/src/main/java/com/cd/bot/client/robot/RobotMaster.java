@@ -1,5 +1,6 @@
 package com.cd.bot.client.robot;
 
+import com.cd.bot.client.kafka.LifecycleOutcomeSender;
 import com.cd.bot.model.domain.bot.AssumedScreenTest;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
@@ -12,6 +13,7 @@ import com.cd.bot.client.tesseract.TesseractWrapper;
 import com.cd.bot.model.domain.BotCamera;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.Date;
@@ -41,7 +43,13 @@ public class RobotMaster {
     @Autowired
     private String password;
 
-    public LifecycleEventOutcome runBot(LifecycleEvent lifecycleEvent) {
+    @Value("${kafka.topic.outcome}")
+    private String outcomeTopic;
+
+    @Autowired
+    private LifecycleOutcomeSender lifecycleOutcomeSender;
+
+    public void runBot(LifecycleEvent lifecycleEvent) {
         LifecycleEventOutcome outcome = null;
         ProcessingLifecycleStatus status = lifecycleEvent.getProcessingLifecycleStatus();
         AssumedScreenTest screenTest = lifecycleEvent.getAssumedScreenTest();
@@ -88,15 +96,15 @@ public class RobotMaster {
             outcome = robotWrapper.getCurrentScreen(status, screenTest);
         } catch (ApplicationDownException e) {
             logger.error(e.getMessage());
-            return new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.APPLICATION_DOWN);
+            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.APPLICATION_DOWN);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         if(outcome == null) {
-            return new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.UNKNOWN);
+            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.UNKNOWN);
         }
 
-        return outcome;
+        lifecycleOutcomeSender.send(outcomeTopic, outcome);
     }
 }

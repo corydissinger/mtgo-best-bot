@@ -15,11 +15,6 @@ import java.util.Date;
  */
 @Repository
 public interface LifecycleEventRepository extends JpaRepository<LifecycleEvent, Long> {
-    @Modifying
-    @Transactional
-    @Query("delete from LifecycleEvent le where le.timeExecuted < ?1")
-    void deleteOlderThan(Date timeExecuted);
-
     LifecycleEvent findByOrderByTimeRequestedDesc();
 
     LifecycleEvent findByPlayerBotOrderByTimeRequestedDesc(PlayerBot playerBot);

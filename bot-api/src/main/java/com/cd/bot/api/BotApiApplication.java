@@ -38,7 +38,8 @@ import java.lang.reflect.Method;
 @EntityScan(basePackages = {"com.cd.bot.model.domain"} )
 @PropertySources({
         @PropertySource("classpath:api-application.properties"),
-        @PropertySource("file:${app.home}/api-application.properties") //wins
+        @PropertySource("file:${app.home}/api-application.properties"), //wins
+        @PropertySource("file:${app.home}/data.properties")
 })
 @Import({BotApiSecurityConfig.class})
 public class BotApiApplication extends WebMvcConfigurerAdapter {

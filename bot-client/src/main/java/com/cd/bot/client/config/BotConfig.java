@@ -1,6 +1,5 @@
 package com.cd.bot.client.config;
 
-import com.cd.bot.client.kafka.LifecycleOutcomeSender;
 import com.cd.bot.client.kafka.RobotLifecycleReceiver;
 import com.cd.bot.client.robot.RobotMaster;
 import com.cd.bot.client.robot.RobotWrapper;
@@ -9,32 +8,32 @@ import com.cd.bot.client.tesseract.ImagePreProcessor;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import net.sourceforge.tess4j.TessAPI1;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.*;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.awt.*;
@@ -46,13 +45,16 @@ import java.util.Map;
  */
 @SpringBootApplication
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
+@EntityScan(basePackages = {"com.cd.bot.model.domain"} )
 @ComponentScan({ "com.cd.bot.client", "com.cd.bot.wrapper" })
 @PropertySources({
     @PropertySource("classpath:client-application.properties"),
-    @PropertySource("file:${app.home}/client-application.properties") //wins
+    @PropertySource("file:${app.home}/client-application.properties"), //wins
+    @PropertySource("file:${app.home}/data.properties")
 })
 @EnableKafka
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, WebMvcAutoConfiguration.class })
+@EnableAutoConfiguration(exclude={WebMvcAutoConfiguration.class})
 public class BotConfig {
 
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
@@ -70,8 +72,7 @@ public class BotConfig {
     // ------------------- START KAFKA
     // ------------------- START KAFKA
     // ------------------- START KAFKA
-    
-    
+
     @Value("${kafka.bootstrap-servers}")
     public String bootstrapServers;
 
@@ -103,53 +104,8 @@ public class BotConfig {
     }
 
     @Bean
-    public Map<String, Object> producerConfigs() {
-        Map<String, Object> props = new HashMap<>();
-        // list of host:port pairs used for establishing the initial connections to the Kakfa cluster
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
-        return props;
-    }
-
-    @Bean
-    public ProducerFactory<String, Object> producerFactory() {
-        DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(producerConfigs());
-        factory.setValueSerializer(lifecycleOutcomeSerializer());
-        return factory;
-    }
-
-    @Bean
-    public JsonSerializer lifecycleOutcomeSerializer() {
-        return new JsonSerializer<>(objectMapper());
-    }
-
-    @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
-    }
-
-    @Bean
     public RobotLifecycleReceiver robotLifecycleReceiver() {
         return new RobotLifecycleReceiver();
-    }
-
-    @Bean
-    public LifecycleOutcomeSender lifecycleOutcomeSender() {
-        return new LifecycleOutcomeSender();
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new HibernateAwareObjectMapper();
-    }
-
-    class HibernateAwareObjectMapper extends ObjectMapper {
-
-        public HibernateAwareObjectMapper() {
-            registerModule(new Hibernate5Module());
-        }
     }
 
     // ------------------- END KAFKA

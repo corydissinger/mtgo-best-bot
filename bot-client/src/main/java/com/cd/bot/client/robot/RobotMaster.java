@@ -1,6 +1,5 @@
 package com.cd.bot.client.robot;
 
-import com.cd.bot.client.kafka.LifecycleOutcomeSender;
 import com.cd.bot.model.domain.bot.AssumedScreenTest;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
@@ -11,6 +10,9 @@ import com.cd.bot.client.system.ProcessManager;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
 import com.cd.bot.model.domain.BotCamera;
+import com.cd.bot.model.domain.repository.BotCameraRepository;
+import com.cd.bot.model.domain.repository.LifecycleEventOutcomeRepository;
+import com.cd.bot.model.domain.repository.LifecycleEventRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +49,13 @@ public class RobotMaster {
     private String outcomeTopic;
 
     @Autowired
-    private LifecycleOutcomeSender lifecycleOutcomeSender;
+    private LifecycleEventRepository lifecycleEventRepository;
+
+    @Autowired
+    private LifecycleEventOutcomeRepository lifecycleEventOutcomeRepository;
+
+    @Autowired
+    private BotCameraRepository botCameraRepository;
 
     public void runBot(LifecycleEvent lifecycleEvent) {
         LifecycleEventOutcome outcome = null;
@@ -93,18 +101,19 @@ public class RobotMaster {
         }
 
         try {
-            outcome = robotWrapper.getCurrentScreen(status, screenTest);
+            outcome = robotWrapper.getCurrentScreen(lifecycleEvent);
         } catch (ApplicationDownException e) {
             logger.error(e.getMessage());
-            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.APPLICATION_DOWN);
+            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.APPLICATION_DOWN, lifecycleEvent);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         if(outcome == null) {
-            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.UNKNOWN);
+            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.UNKNOWN, lifecycleEvent);
         }
 
-        lifecycleOutcomeSender.send(outcomeTopic, outcome);
+        botCameraRepository.save(outcome.getBotCamera());
+        lifecycleEventOutcomeRepository.save(outcome);
     }
 }

@@ -50,7 +50,8 @@ import java.util.Map;
 @EnableKafka
 @PropertySources({
         @PropertySource("classpath:orchestrator-application.properties"),
-        @PropertySource("file:${app.home}/orchestrator-application.properties") //wins
+        @PropertySource("file:${app.home}/orchestrator-application.properties"), //wins
+        @PropertySource("file:${app.home}/data.properties")
 })
 public class BotOrchestratorApplication {
 
@@ -77,40 +78,15 @@ public class BotOrchestratorApplication {
     @Autowired
     PlayerBotRepository playerBotRepository;
 
-    // -------------- KAFKA
+    // ------------------- START KAFKA
+    // ------------------- START KAFKA
+    // ------------------- START KAFKA
 
     @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Value("${kafka.topic.bot}")
     private String botTopic;
-
-    @Bean
-    public Map<String, Object> consumerConfigs() {
-        Map<String, Object> props = new HashMap<>();
-        // list of host:port pairs used for establishing the initial connections to the Kakfa cluster
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        // allows a pool of processes to divide the work of consuming and processing records
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "outcome");
-
-        return props;
-    }
-
-    @Bean
-    public ConsumerFactory<String, LifecycleEventOutcome> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(), new JsonDeserializer<>(LifecycleEventOutcome.class));
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, LifecycleEventOutcome> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, LifecycleEventOutcome> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
-
-        return factory;
-    }
 
     @Bean
     public Map<String, Object> producerConfigs() {
@@ -145,6 +121,10 @@ public class BotOrchestratorApplication {
         return new LifecycleEventSender();
     }
 
+    // ------------------- END KAFKA
+    // ------------------- END KAFKA
+    // ------------------- END KAFKA
+
     @Scheduled(fixedDelay = 5000)
     public void doWork() {
         LifecycleEvent event = lifecycleEventRepository.findByOrderByTimeRequestedDesc();
@@ -170,6 +150,5 @@ public class BotOrchestratorApplication {
         cal.add(Calendar.HOUR, -1);
         Date oneHourBack = cal.getTime();
         botCameraRepository.deleteOlderThan(oneHourBack);
-        lifecycleEventRepository.deleteOlderThan(oneHourBack);
     }
 }

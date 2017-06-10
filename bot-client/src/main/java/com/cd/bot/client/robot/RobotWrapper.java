@@ -1,6 +1,7 @@
 package com.cd.bot.client.robot;
 
 import com.cd.bot.model.domain.bot.AssumedScreenTest;
+import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
 import com.cd.bot.model.domain.bot.ProcessingLifecycleStatus;
 import com.cd.bot.model.domain.bot.exception.ApplicationDownException;
@@ -56,7 +57,10 @@ public class RobotWrapper {
     @Autowired
     private RawLinesProcessor rawLinesProcessor;
 
-    public LifecycleEventOutcome getCurrentScreen(ProcessingLifecycleStatus status, AssumedScreenTest screenTest) throws ApplicationDownException, IOException {
+    public LifecycleEventOutcome getCurrentScreen(LifecycleEvent event) throws ApplicationDownException, IOException {
+        ProcessingLifecycleStatus status = event.getProcessingLifecycleStatus();
+        AssumedScreenTest screenTest = event.getAssumedScreenTest();
+
         if(!processManager.isMtgoRunningOrLoading()) {
             throw new ApplicationDownException("MTGO is not running!");
         }
@@ -83,7 +87,7 @@ public class RobotWrapper {
             }
 
             logger.info("Processing raw lines");
-            status = rawLinesProcessor.determineLifecycleStatus(rawLines);
+            final ProcessingLifecycleStatus outcomeStatus = rawLinesProcessor.determineLifecycleStatus(rawLines);
             logger.info("Determined new status: " + status.name());
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -94,7 +98,7 @@ public class RobotWrapper {
 
             BotCamera botCamera = new BotCamera(imageAsByteArray, new Date());
 
-            return new LifecycleEventOutcome(botCamera, status);
+            return new LifecycleEventOutcome(botCamera, outcomeStatus, event);
 
         }
 

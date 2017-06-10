@@ -3,10 +3,8 @@ package com.cd.bot.api.controller;
 import com.cd.bot.api.BotApiApplication;
 import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
-import com.cd.bot.model.domain.repository.BotCameraRepository;
-import com.cd.bot.model.domain.repository.LifecycleEventRepository;
-import com.cd.bot.model.domain.repository.OwnedTradeableCardRepository;
-import com.cd.bot.model.domain.repository.PlayerBotRepository;
+import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
+import com.cd.bot.model.domain.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +34,9 @@ public class BotController {
     @Autowired
     LifecycleEventRepository lifecycleEventRepository;
 
+    @Autowired
+    LifecycleEventOutcomeRepository lifecycleEventOutcomeRepository;
+
     @RequestMapping(value = ENDPOINT_ROOT, method = RequestMethod.GET)
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
     public List<PlayerBot> get() {
@@ -61,10 +62,11 @@ public class BotController {
     public PlayerBot details(@PathVariable final String name) {
         PlayerBot playerBot = playerBotRepository.findByName(name);
         LifecycleEvent mostRecentEvent = lifecycleEventRepository.findByPlayerBotOrderByTimeRequestedDesc(playerBot);
+        LifecycleEventOutcome mostRecentOutcome = lifecycleEventOutcomeRepository.findByLifecycleEvent(mostRecentEvent);
 
         playerBot.setBotCameras(botCameraRepository.findByPlayerBot(playerBot));
         playerBot.setBotCards(ownedTradeableCardRepository.findByPlayerBot(playerBot));
-        playerBot.setStatus(getStatusFromEvent(mostRecentEvent));
+        playerBot.setStatus(getStatusFromEvent(mostRecentOutcome));
 
         return playerBot;
     }
@@ -77,8 +79,8 @@ public class BotController {
         return ResponseEntity.ok(null);
     }
 
-    private String getStatusFromEvent(LifecycleEvent mostRecentEvent) {
-        if(mostRecentEvent.getTimeExecuted() != null) {
+    private String getStatusFromEvent(LifecycleEventOutcome outcome) {
+        if(outcome != null) {
             return "Ready";
         } else {
             return "Processing";

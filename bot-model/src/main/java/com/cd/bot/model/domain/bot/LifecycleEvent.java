@@ -26,9 +26,6 @@ public class LifecycleEvent implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeRequested;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timeExecuted;
-
     protected LifecycleEvent() {}
 
     public LifecycleEvent(AssumedScreenTest assumedScreenTest, ProcessingLifecycleStatus processingLifecycleStatus, PlayerBot playerBot, Date timeRequested) {
@@ -68,14 +65,6 @@ public class LifecycleEvent implements Serializable {
 
     public void setTimeRequested(Date timeRequested) {
         this.timeRequested = timeRequested;
-    }
-
-    public Date getTimeExecuted() {
-        return timeExecuted;
-    }
-
-    public void setTimeExecuted(Date timeExecuted) {
-        this.timeExecuted = timeExecuted;
     }
 
     public PlayerBot getPlayerBot() {

@@ -13,6 +13,7 @@ import com.cd.bot.model.domain.BotCamera;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
 import com.cd.bot.model.domain.repository.LifecycleEventOutcomeRepository;
 import com.cd.bot.model.domain.repository.LifecycleEventRepository;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,9 +59,8 @@ public class RobotMaster {
     private BotCameraRepository botCameraRepository;
 
     public void runBot(LifecycleEvent lifecycleEvent) {
-        LifecycleEventOutcome outcome = null;
         ProcessingLifecycleStatus status = lifecycleEvent.getProcessingLifecycleStatus();
-        AssumedScreenTest screenTest = lifecycleEvent.getAssumedScreenTest();
+        AssumedScreenTest screenTest = null;
 
         logger.info("Current state is: " + status.name());
 
@@ -72,6 +72,10 @@ public class RobotMaster {
                 screenTest = AssumedScreenTest.TRADE; //do some shits
                 break;
             case UNKNOWN:
+                screenTest = AssumedScreenTest.EULA;
+                break;
+            case DETERMINE_LOGIN_READY:
+                screenTest = AssumedScreenTest.LOGIN;
                 break;
             case ACCEPT_TOS_EULA_READY:
                 final int yOffEnd = ScreenConstants.ACCEPT_TOS_SCROLL_TOP.getTop() + 400;
@@ -100,20 +104,30 @@ public class RobotMaster {
                 break;
         }
 
+        BotCamera botCamera;
+        ProcessingLifecycleStatus outcomeStatus;
+
         try {
-            outcome = robotWrapper.getCurrentScreen(lifecycleEvent);
+            Pair<ProcessingLifecycleStatus, byte[]> statusToImageResult = robotWrapper.getCurrentScreen(status, screenTest);
+            botCamera = new BotCamera(statusToImageResult.getRight(), new Date());
+            outcomeStatus = statusToImageResult.getLeft();
         } catch (ApplicationDownException e) {
             logger.error(e.getMessage());
-            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.APPLICATION_DOWN, lifecycleEvent);
+            botCamera = new BotCamera(new byte[0], new Date());
+            outcomeStatus = ProcessingLifecycleStatus.APPLICATION_DOWN;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new RuntimeException(e);
         }
 
-        if(outcome == null) {
-            outcome = new LifecycleEventOutcome(new BotCamera(new byte[0], new Date()), ProcessingLifecycleStatus.UNKNOWN, lifecycleEvent);
-        }
+        botCameraRepository.save(botCamera);
 
-        botCameraRepository.save(outcome.getBotCamera());
-        lifecycleEventOutcomeRepository.save(outcome);
+        if(ProcessingLifecycleStatus.APPLICATION_READY != outcomeStatus) {
+            LifecycleEvent nextAutomaticEvent = new LifecycleEvent(outcomeStatus, lifecycleEvent.getPlayerBot(), new Date());
+            lifecycleEventRepository.save(nextAutomaticEvent);
+        } else {
+            final LifecycleEventOutcome outcome = new LifecycleEventOutcome(botCamera, outcomeStatus, lifecycleEvent);
+            lifecycleEventOutcomeRepository.save(outcome);
+        }
     }
 }

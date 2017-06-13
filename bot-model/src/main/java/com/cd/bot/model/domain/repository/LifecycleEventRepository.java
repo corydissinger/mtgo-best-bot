@@ -17,5 +17,6 @@ import java.util.Date;
 public interface LifecycleEventRepository extends JpaRepository<LifecycleEvent, Long> {
     LifecycleEvent findByOrderByTimeRequestedDesc();
 
+    @Query("SELECT le FROM LifecycleEvent le LEFT JOIN le.lifecycleEventOutcome")
     LifecycleEvent findByPlayerBotOrderByTimeRequestedDesc(PlayerBot playerBot);
 }

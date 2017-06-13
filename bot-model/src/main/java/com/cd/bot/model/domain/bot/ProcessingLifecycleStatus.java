@@ -13,5 +13,6 @@ public enum ProcessingLifecycleStatus {
     LOGIN_READY,
     LOGGING_IN,
     ABORT_LIFE,
-    APPLICATION_START
+    APPLICATION_START,
+    DETERMINE_LOGIN_READY
 }

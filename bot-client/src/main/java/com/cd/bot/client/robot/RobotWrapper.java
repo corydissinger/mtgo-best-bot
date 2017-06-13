@@ -12,6 +12,8 @@ import com.cd.bot.client.tesseract.TesseractWrapper;
 import com.cd.bot.model.domain.BotCamera;
 import com.cd.bot.model.domain.PlayerBot;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -57,33 +59,20 @@ public class RobotWrapper {
     @Autowired
     private RawLinesProcessor rawLinesProcessor;
 
-    public LifecycleEventOutcome getCurrentScreen(LifecycleEvent event) throws ApplicationDownException, IOException {
-        ProcessingLifecycleStatus status = event.getProcessingLifecycleStatus();
-        AssumedScreenTest screenTest = event.getAssumedScreenTest();
-
+    public Pair<ProcessingLifecycleStatus, byte[]> getCurrentScreen(final ProcessingLifecycleStatus status, final AssumedScreenTest screenTest) throws ApplicationDownException, IOException {
         if(!processManager.isMtgoRunningOrLoading()) {
             throw new ApplicationDownException("MTGO is not running!");
         }
 
         BufferedImage bi = robot.createScreenCapture(new Rectangle(0, 0, screenWidth, screenHeight));
-        //TODO - MULTI SCREEN STATE TEST BOIY
-        if(status == ProcessingLifecycleStatus.UNKNOWN) {
-            if(screenTest == AssumedScreenTest.EULA) {
-                screenTest = AssumedScreenTest.HOME_PAGE;
-            } if(screenTest == AssumedScreenTest.HOME_PAGE) {
-                screenTest = AssumedScreenTest.LOGIN;
-            } else {
-                screenTest = AssumedScreenTest.EULA;
-            }
-        }
 
         if(bi != null) {
             RawLines rawLines;
 
-            if (screenTest != AssumedScreenTest.NOT_NEEDED) {
-                rawLines = tesseractWrapper.getRawText(bi, screenTest.getScreenTestBounds());
-            } else {
+            if (screenTest == AssumedScreenTest.NOT_NEEDED) {
                 rawLines = tesseractWrapper.getRawText(bi);
+            } else {
+                rawLines = tesseractWrapper.getRawText(bi, screenTest.getScreenTestBounds());
             }
 
             logger.info("Processing raw lines");
@@ -96,10 +85,7 @@ public class RobotWrapper {
             byte[] imageAsByteArray = baos.toByteArray();
             baos.close();
 
-            BotCamera botCamera = new BotCamera(imageAsByteArray, new Date());
-
-            return new LifecycleEventOutcome(botCamera, outcomeStatus, event);
-
+            return new ImmutablePair<>(outcomeStatus, imageAsByteArray);
         }
 
         throw new ApplicationDownException("Somehow made it to this unreachable point");

@@ -16,20 +16,22 @@ public class LifecycleEvent implements Serializable {
     @GeneratedValue
     private Long id;
 
-    private AssumedScreenTest assumedScreenTest;
     private ProcessingLifecycleStatus processingLifecycleStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="bot_id")
-    private PlayerBot playerBot;    
+    private PlayerBot playerBot;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "lifecycleEventOutcome")
+    @JoinColumn(nullable = true)
+    private LifecycleEventOutcome lifecycleEventOutcome;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeRequested;
 
     protected LifecycleEvent() {}
 
-    public LifecycleEvent(AssumedScreenTest assumedScreenTest, ProcessingLifecycleStatus processingLifecycleStatus, PlayerBot playerBot, Date timeRequested) {
-        this.assumedScreenTest = assumedScreenTest;
+    public LifecycleEvent(ProcessingLifecycleStatus processingLifecycleStatus, PlayerBot playerBot, Date timeRequested) {
         this.processingLifecycleStatus = processingLifecycleStatus;
         this.playerBot = playerBot;
         this.timeRequested = timeRequested;
@@ -41,14 +43,6 @@ public class LifecycleEvent implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public AssumedScreenTest getAssumedScreenTest() {
-        return assumedScreenTest;
-    }
-
-    public void setAssumedScreenTest(AssumedScreenTest assumedScreenTest) {
-        this.assumedScreenTest = assumedScreenTest;
     }
 
     public ProcessingLifecycleStatus getProcessingLifecycleStatus() {
@@ -73,5 +67,13 @@ public class LifecycleEvent implements Serializable {
 
     public void setPlayerBot(PlayerBot playerBot) {
         this.playerBot = playerBot;
+    }
+
+    public LifecycleEventOutcome getLifecycleEventOutcome() {
+        return lifecycleEventOutcome;
+    }
+
+    public void setLifecycleEventOutcome(LifecycleEventOutcome lifecycleEventOutcome) {
+        this.lifecycleEventOutcome = lifecycleEventOutcome;
     }
 }

@@ -126,7 +126,7 @@ public class RobotMaster {
             LifecycleEvent nextAutomaticEvent = new LifecycleEvent(outcomeStatus, lifecycleEvent.getPlayerBot(), new Date());
             lifecycleEventRepository.save(nextAutomaticEvent);
         } else {
-            final LifecycleEventOutcome outcome = new LifecycleEventOutcome(botCamera, outcomeStatus, lifecycleEvent);
+            final LifecycleEventOutcome outcome = new LifecycleEventOutcome(botCamera, outcomeStatus);
             lifecycleEventOutcomeRepository.save(outcome);
         }
     }

@@ -9,6 +9,4 @@ import org.springframework.stereotype.Repository;
  * Created by Cory on 6/10/2017.
  */
 @Repository
-public interface LifecycleEventOutcomeRepository extends JpaRepository<LifecycleEventOutcome, Long> {
-    LifecycleEventOutcome findByLifecycleEvent(LifecycleEvent event);
-}
+public interface LifecycleEventOutcomeRepository extends JpaRepository<LifecycleEventOutcome, Long> { }

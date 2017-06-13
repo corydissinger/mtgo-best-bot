@@ -4,6 +4,7 @@ import com.cd.bot.model.domain.BotCamera;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Cory on 5/23/2017.
@@ -19,18 +20,17 @@ public class LifecycleEventOutcome implements Serializable {
     @JoinColumn(name="BOT_CAMERA_ID")
     private BotCamera botCamera;
 
-    @OneToOne
-    @JoinColumn(name="LIFECYCLE_EVENT_ID")
-    private LifecycleEvent lifecycleEvent;
+    @OneToMany(mappedBy = "lifecycleEventOutcome", fetch = FetchType.LAZY)
+    private List<LifecycleEvent> lifecycleEvents;
 
     private ProcessingLifecycleStatus processingLifecycleStatus;
 
     protected LifecycleEventOutcome() {}
 
-    public LifecycleEventOutcome(BotCamera botCamera, ProcessingLifecycleStatus processingLifecycleStatus, LifecycleEvent lifecycleEvent) {
+    public LifecycleEventOutcome(BotCamera botCamera, ProcessingLifecycleStatus processingLifecycleStatus) {
         this.botCamera = botCamera;
         this.processingLifecycleStatus = processingLifecycleStatus;
-        this.lifecycleEvent = lifecycleEvent;
+        this.lifecycleEvents = lifecycleEvents;
     }
 
     public BotCamera getBotCamera() {
@@ -49,11 +49,11 @@ public class LifecycleEventOutcome implements Serializable {
         this.processingLifecycleStatus = processingLifecycleStatus;
     }
 
-    public LifecycleEvent getLifecycleEvent() {
-        return lifecycleEvent;
+    public List<LifecycleEvent> getLifecycleEvents() {
+        return lifecycleEvents;
     }
 
-    public void setLifecycleEvent(LifecycleEvent lifecycleEvent) {
-        this.lifecycleEvent = lifecycleEvent;
+    public void setLifecycleEvents(List<LifecycleEvent> lifecycleEvents) {
+        this.lifecycleEvents = lifecycleEvents;
     }
 }

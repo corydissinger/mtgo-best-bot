@@ -22,8 +22,8 @@ public class LifecycleEvent implements Serializable {
     @JoinColumn(name="bot_id")
     private PlayerBot playerBot;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "lifecycleEventOutcome")
-    @JoinColumn(nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="lifecycleeventoutcome_id")
     private LifecycleEventOutcome lifecycleEventOutcome;
     
     @Temporal(TemporalType.TIMESTAMP)

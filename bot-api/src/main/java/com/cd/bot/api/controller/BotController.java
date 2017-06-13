@@ -62,11 +62,10 @@ public class BotController {
     public PlayerBot details(@PathVariable final String name) {
         PlayerBot playerBot = playerBotRepository.findByName(name);
         LifecycleEvent mostRecentEvent = lifecycleEventRepository.findByPlayerBotOrderByTimeRequestedDesc(playerBot);
-        LifecycleEventOutcome mostRecentOutcome = lifecycleEventOutcomeRepository.findByLifecycleEvent(mostRecentEvent);
 
         playerBot.setBotCameras(botCameraRepository.findByPlayerBot(playerBot));
         playerBot.setBotCards(ownedTradeableCardRepository.findByPlayerBot(playerBot));
-        playerBot.setStatus(getStatusFromEvent(mostRecentOutcome));
+        playerBot.setStatus(getStatusFromEvent(mostRecentEvent.getLifecycleEventOutcome()));
 
         return playerBot;
     }

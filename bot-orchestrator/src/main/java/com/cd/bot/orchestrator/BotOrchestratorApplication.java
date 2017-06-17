@@ -1,11 +1,13 @@
 package com.cd.bot.orchestrator;
 
+import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
 import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
 import com.cd.bot.model.domain.repository.BotCameraRepository;
 import com.cd.bot.model.domain.repository.LifecycleEventRepository;
 import com.cd.bot.model.domain.repository.PlayerBotRepository;
 import com.cd.bot.orchestrator.kafka.LifecycleEventSender;
+import com.cd.bot.orchestrator.scheduling.ExecuteNextLifecycleEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -31,11 +33,9 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Cory on 5/16/2017.
@@ -127,9 +127,18 @@ public class BotOrchestratorApplication {
 
     @Scheduled(fixedDelay = 5000)
     public void doWork() {
-        LifecycleEvent event = lifecycleEventRepository.findByOrderByTimeRequestedDesc();
+        List<PlayerBot> activeBots = playerBotRepository.findAll();
 
-        lifecycleEventSender().send(botTopic, event);
+        for(PlayerBot playerBot : activeBots) {
+            List<LifecycleEvent> lifecycleEvents = lifecycleEventRepository.findByPlayerBotAndLifecycleEventOutcomeIsNull(playerBot);
+
+            for(LifecycleEvent lifecycleEvent : lifecycleEvents) {
+                if(lifecycleEvent != null) {
+                    ExecuteNextLifecycleEvent executeNextLifecycleEvent = executeNextLifecycleEvent(lifecycleEvent);
+                    threadPoolTaskScheduler().execute(executeNextLifecycleEvent);
+                }
+            }
+        }
     }
 
     @Bean
@@ -142,6 +151,22 @@ public class BotOrchestratorApplication {
         public HibernateAwareObjectMapper() {
             registerModule(new Hibernate5Module());
         }
+    }
+
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
+        ThreadPoolTaskScheduler threadPoolTaskScheduler
+                = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setThreadNamePrefix(
+                "ThreadPoolTaskScheduler");
+        return threadPoolTaskScheduler;
+    }
+
+    @Bean
+    @Scope("prototype")
+    public ExecuteNextLifecycleEvent executeNextLifecycleEvent(LifecycleEvent lifecycleEvent) {
+        return new ExecuteNextLifecycleEvent(lifecycleEvent, lifecycleEventSender(), botTopic);
     }
 
     @Scheduled(fixedRate = 60000)

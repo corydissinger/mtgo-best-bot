@@ -34,11 +34,15 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Cory on 5/11/2017.
@@ -54,6 +58,7 @@ import java.util.Map;
     @PropertySource("file:${app.home}/data.properties")
 })
 @EnableKafka
+@EnableScheduling
 @EnableAutoConfiguration(exclude={WebMvcAutoConfiguration.class})
 public class BotConfig {
 
@@ -220,4 +225,19 @@ public class BotConfig {
         return new RobotMaster();
     }
 
+    @Bean
+    public BlockingQueue<LifecycleEvent> processingEventsQueue() {
+        return new ArrayBlockingQueue<>(10);
+    }
+
+    //It's a 'transaction'
+    @Scheduled(fixedDelay = 1)
+    public void doWork() {
+        LifecycleEvent nextEvent = processingEventsQueue().peek();
+
+        if(nextEvent != null) {
+            robotActorMaster().runBot(nextEvent);
+            processingEventsQueue().remove();
+        }
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Cory on 6/2/2017.
@@ -17,6 +18,5 @@ import java.util.Date;
 public interface LifecycleEventRepository extends JpaRepository<LifecycleEvent, Long> {
     LifecycleEvent findByOrderByTimeRequestedDesc();
 
-    @Query("SELECT le FROM LifecycleEvent le LEFT JOIN le.lifecycleEventOutcome")
-    LifecycleEvent findByPlayerBotOrderByTimeRequestedDesc(PlayerBot playerBot);
+    List<LifecycleEvent> findByPlayerBotAndLifecycleEventOutcomeIsNull(PlayerBot playerBot);
 }

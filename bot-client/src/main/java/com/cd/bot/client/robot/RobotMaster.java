@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Cory on 5/13/2017.
@@ -57,6 +58,9 @@ public class RobotMaster {
 
     @Autowired
     private BotCameraRepository botCameraRepository;
+
+    @Autowired
+    private BlockingQueue<LifecycleEvent> processingEventsQueue;
 
     public void runBot(LifecycleEvent lifecycleEvent) {
         ProcessingLifecycleStatus status = lifecycleEvent.getProcessingLifecycleStatus();

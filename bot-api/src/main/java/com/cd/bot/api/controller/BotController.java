@@ -61,11 +61,11 @@ public class BotController {
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
     public PlayerBot details(@PathVariable final String name) {
         PlayerBot playerBot = playerBotRepository.findByName(name);
-        LifecycleEvent mostRecentEvent = lifecycleEventRepository.findByPlayerBotOrderByTimeRequestedDesc(playerBot);
+        List<LifecycleEvent> mostRecentEvents = lifecycleEventRepository.findByPlayerBotAndLifecycleEventOutcomeIsNull(playerBot);
 
         playerBot.setBotCameras(botCameraRepository.findByPlayerBot(playerBot));
         playerBot.setBotCards(ownedTradeableCardRepository.findByPlayerBot(playerBot));
-        playerBot.setStatus(getStatusFromEvent(mostRecentEvent.getLifecycleEventOutcome()));
+        playerBot.setStatus(getStatusFromEvent(mostRecentEvents));
 
         return playerBot;
     }
@@ -78,11 +78,13 @@ public class BotController {
         return ResponseEntity.ok(null);
     }
 
-    private String getStatusFromEvent(LifecycleEventOutcome outcome) {
-        if(outcome != null) {
-            return "Ready";
-        } else {
-            return "Processing";
+    private String getStatusFromEvent(List<LifecycleEvent> mostRecentEvents) {
+        for(LifecycleEvent lifecycleEvent : mostRecentEvents) {
+            if(lifecycleEvent.getLifecycleEventOutcome() == null) {
+                return "Processing";
+            }
         }
+
+        return "Ready";
     }
 }

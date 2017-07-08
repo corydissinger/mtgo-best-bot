@@ -169,11 +169,12 @@ public class BotOrchestratorApplication {
         return new ExecuteNextLifecycleEvent(lifecycleEvent, lifecycleEventSender(), botTopic);
     }
 
+    /* PREMATURE OPTIMIZATION - Delete query became busted after numerous refactors of JPA Entities
     @Scheduled(fixedRate = 60000)
     public void killOldCameraShots() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.HOUR, -1);
         Date oneHourBack = cal.getTime();
         botCameraRepository.deleteOlderThan(oneHourBack);
-    }
+    }*/
 }

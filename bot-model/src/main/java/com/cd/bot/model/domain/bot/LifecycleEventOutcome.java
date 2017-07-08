@@ -16,8 +16,8 @@ public class LifecycleEventOutcome implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name="BOT_CAMERA_ID")
+    @OneToOne(optional = true)
+    @JoinColumn(name="BOT_CAMERA_ID", unique = true, nullable = true, updatable = false)
     private BotCamera botCamera;
 
     @OneToMany(mappedBy = "lifecycleEventOutcome", fetch = FetchType.LAZY)

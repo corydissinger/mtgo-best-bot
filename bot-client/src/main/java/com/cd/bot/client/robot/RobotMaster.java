@@ -126,7 +126,9 @@ public class RobotMaster {
 
         botCameraRepository.save(botCamera);
 
-        if(ProcessingLifecycleStatus.APPLICATION_READY != outcomeStatus) {
+        if(ProcessingLifecycleStatus.APPLICATION_READY != outcomeStatus
+            && ProcessingLifecycleStatus.APPLICATION_DOWN != outcomeStatus) {
+
             LifecycleEvent nextAutomaticEvent = new LifecycleEvent(outcomeStatus, lifecycleEvent.getPlayerBot(), new Date());
             lifecycleEventRepository.save(nextAutomaticEvent);
         } else {

@@ -18,5 +18,5 @@ import java.util.List;
 public interface LifecycleEventRepository extends JpaRepository<LifecycleEvent, Long> {
     LifecycleEvent findByOrderByTimeRequestedDesc();
 
-    List<LifecycleEvent> findByPlayerBotAndLifecycleEventOutcomeIsNull(PlayerBot playerBot);
+    List<LifecycleEvent> findByPlayerBotAndLifecycleEventOutcomeIsNullAndAutomaticFalse(PlayerBot playerBot);
 }

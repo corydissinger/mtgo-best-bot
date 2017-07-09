@@ -7,7 +7,11 @@ import com.cd.bot.client.system.ProcessManager;
 import com.cd.bot.client.tesseract.ImagePreProcessor;
 import com.cd.bot.client.tesseract.RawLinesProcessor;
 import com.cd.bot.client.tesseract.TesseractWrapper;
+import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
+import com.cd.bot.model.domain.bot.ProcessingLifecycleStatus;
+import com.cd.bot.model.domain.repository.LifecycleEventRepository;
+import com.cd.bot.model.domain.repository.PlayerBotRepository;
 import net.sourceforge.tess4j.TessAPI1;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -39,9 +43,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.awt.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -225,19 +231,34 @@ public class BotConfig {
         return new RobotMaster();
     }
 
+    @Autowired
+    PlayerBotRepository playerBotRepository;
+
+    @Bean
+    public PlayerBot playerBot() {
+        return playerBotRepository.findByName(botName());
+    }
+
     @Bean
     public BlockingQueue<LifecycleEvent> processingEventsQueue() {
-        return new ArrayBlockingQueue<>(10);
+        BlockingQueue<LifecycleEvent> processingEventsQueue = new ArrayBlockingQueue<>(10);
+
+        try {
+            processingEventsQueue.put(new LifecycleEvent(ProcessingLifecycleStatus.APPLICATION_START, playerBot(), new Date()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return processingEventsQueue;
     }
 
     //It's a 'transaction'
     @Scheduled(fixedDelay = 1)
     public void doWork() {
-        LifecycleEvent nextEvent = processingEventsQueue().peek();
+        LifecycleEvent nextEvent = processingEventsQueue().poll();
 
         if(nextEvent != null) {
             robotActorMaster().runBot(nextEvent);
-            processingEventsQueue().remove();
         }
     }
 }

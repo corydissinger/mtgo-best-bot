@@ -3,7 +3,6 @@ package com.cd.bot.api.controller;
 import com.cd.bot.api.BotApiApplication;
 import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.model.domain.bot.LifecycleEvent;
-import com.cd.bot.model.domain.bot.LifecycleEventOutcome;
 import com.cd.bot.model.domain.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +60,7 @@ public class BotController {
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
     public PlayerBot details(@PathVariable final String name) {
         PlayerBot playerBot = playerBotRepository.findByName(name);
-        List<LifecycleEvent> mostRecentEvents = lifecycleEventRepository.findByPlayerBotAndLifecycleEventOutcomeIsNull(playerBot);
+        List<LifecycleEvent> mostRecentEvents = lifecycleEventRepository.findByPlayerBotAndLifecycleEventOutcomeIsNullAndAutomaticFalse(playerBot);
 
         playerBot.setBotCameras(botCameraRepository.findByPlayerBot(playerBot));
         playerBot.setBotCards(ownedTradeableCardRepository.findByPlayerBot(playerBot));

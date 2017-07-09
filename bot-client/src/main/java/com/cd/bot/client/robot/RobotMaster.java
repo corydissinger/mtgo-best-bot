@@ -15,6 +15,7 @@ import com.cd.bot.model.domain.repository.LifecycleEventOutcomeRepository;
 import com.cd.bot.model.domain.repository.LifecycleEventRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.omg.CORBA.UNKNOWN;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -64,7 +65,7 @@ public class RobotMaster {
 
     public void runBot(LifecycleEvent lifecycleEvent) {
         ProcessingLifecycleStatus status = lifecycleEvent.getProcessingLifecycleStatus();
-        AssumedScreenTest screenTest = null;
+        AssumedScreenTest screenTest = AssumedScreenTest.NOT_NEEDED;
 
         logger.info("Current state is: " + status.name());
 
@@ -109,16 +110,16 @@ public class RobotMaster {
         }
 
         BotCamera botCamera;
-        ProcessingLifecycleStatus outcomeStatus;
+        ProcessingLifecycleStatus currentScreenOutcomeStatus;
 
         try {
             Pair<ProcessingLifecycleStatus, byte[]> statusToImageResult = robotWrapper.getCurrentScreen(status, screenTest);
             botCamera = new BotCamera(statusToImageResult.getRight(), new Date());
-            outcomeStatus = statusToImageResult.getLeft();
+            currentScreenOutcomeStatus = statusToImageResult.getLeft();
         } catch (ApplicationDownException e) {
             logger.error(e.getMessage());
             botCamera = new BotCamera(new byte[0], new Date());
-            outcomeStatus = ProcessingLifecycleStatus.APPLICATION_DOWN;
+            currentScreenOutcomeStatus = ProcessingLifecycleStatus.APPLICATION_DOWN;
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
@@ -126,14 +127,45 @@ public class RobotMaster {
 
         botCameraRepository.save(botCamera);
 
-        if(ProcessingLifecycleStatus.APPLICATION_READY != outcomeStatus
-            && ProcessingLifecycleStatus.APPLICATION_DOWN != outcomeStatus) {
-
-            LifecycleEvent nextAutomaticEvent = new LifecycleEvent(outcomeStatus, lifecycleEvent.getPlayerBot(), new Date());
-            lifecycleEventRepository.save(nextAutomaticEvent);
-        } else {
-            final LifecycleEventOutcome outcome = new LifecycleEventOutcome(botCamera, outcomeStatus);
+        if(ProcessingLifecycleStatus.APPLICATION_READY == currentScreenOutcomeStatus) {
+            final LifecycleEventOutcome outcome = new LifecycleEventOutcome(botCamera, currentScreenOutcomeStatus);
+            lifecycleEvent.setLifecycleEventOutcome(outcome);
             lifecycleEventOutcomeRepository.save(outcome);
+            lifecycleEventRepository.save(lifecycleEvent);
+        } else {
+            LifecycleEvent nextAutomaticEvent = new LifecycleEvent(getNextAutomaticStatus(currentScreenOutcomeStatus, screenTest), lifecycleEvent.getPlayerBot(), new Date());
+            nextAutomaticEvent.setAutomatic(true);
+            lifecycleEventRepository.save(nextAutomaticEvent);
+
+            try {
+                processingEventsQueue.put(nextAutomaticEvent);
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage());
+            }
+        }
+    }
+
+    private ProcessingLifecycleStatus getNextAutomaticStatus(ProcessingLifecycleStatus priorStatus, AssumedScreenTest priorScreenTest) {
+        switch(priorStatus) {
+            case APPLICATION_DOWN:
+                return ProcessingLifecycleStatus.APPLICATION_START;
+            case APPLICATION_START:
+                return ProcessingLifecycleStatus.UNKNOWN;
+            case UNKNOWN:
+                return getNextAutomaticStatusFromUnknown(priorScreenTest);
+            default:
+                return priorStatus;
+        }
+    }
+
+    private ProcessingLifecycleStatus getNextAutomaticStatusFromUnknown(AssumedScreenTest priorScreenTest) {
+        switch (priorScreenTest) {
+            case NOT_NEEDED:
+                return ProcessingLifecycleStatus.DETERMINE_LOGIN_READY;
+            case EULA:
+                return ProcessingLifecycleStatus.DETERMINE_LOGIN_READY;
+            default:
+                return ProcessingLifecycleStatus.ABORT_LIFE;
         }
     }
 }

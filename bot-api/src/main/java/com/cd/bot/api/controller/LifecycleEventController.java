@@ -59,6 +59,7 @@ public class LifecycleEventController {
     @PreAuthorize(BotApiApplication.HAS_AUTH_ROLE_ORCHESTRATOR)
     public ResponseEntity<Void> save(@RequestBody final LifecycleEvent newLifecycleEvent) {
         newLifecycleEvent.setPlayerBot(playerBotRepository.findByName(newLifecycleEvent.getPlayerBot().getName()));
+        newLifecycleEvent.setAutomatic(false);
         lifecycleEventRepository.save(newLifecycleEvent);
 
         return ResponseEntity.ok(null);

@@ -29,6 +29,8 @@ public class LifecycleEvent implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeRequested;
 
+    private Boolean automatic;
+
     protected LifecycleEvent() {}
 
     public LifecycleEvent(ProcessingLifecycleStatus processingLifecycleStatus, PlayerBot playerBot, Date timeRequested) {
@@ -75,5 +77,13 @@ public class LifecycleEvent implements Serializable {
 
     public void setLifecycleEventOutcome(LifecycleEventOutcome lifecycleEventOutcome) {
         this.lifecycleEventOutcome = lifecycleEventOutcome;
+    }
+
+    public Boolean getAutomatic() {
+        return automatic;
+    }
+
+    public void setAutomatic(Boolean automatic) {
+        this.automatic = automatic;
     }
 }

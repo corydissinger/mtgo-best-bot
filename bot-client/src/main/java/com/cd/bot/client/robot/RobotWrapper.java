@@ -108,6 +108,13 @@ public class RobotWrapper {
         } else {
             processManager.startApplication();
         }
+
+        //DEFENSE
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void clickAndDragVertical(int xOffOrig, int yOffOrig, int yOffEnd) {

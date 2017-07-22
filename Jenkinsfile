@@ -5,10 +5,6 @@ node {
     def rtMaven = Artifactory.newMavenBuild()
     def buildInfo
 
-    stage('Clone sources') {
-        git url: 'https://github.com/corydissinger/mtgo-best-bot.git'
-    }
-
     stage('Artifactory configuration') {
         // Tool name from Jenkins configuration
         rtMaven.tool = "Maven-3.3.9"

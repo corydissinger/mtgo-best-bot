@@ -1,23 +1,37 @@
 node {
-    // Get Artifactory server instance, defined in the Artifactory Plugin administration page.
-    def server = Artifactory.server "localhost"
-    // Create an Artifactory Maven instance.
-    def rtMaven = Artifactory.newMavenBuild()
+    def server
     def buildInfo
+    def rtMaven
 
-    stage('Artifactory configuration') {
-        // Tool name from Jenkins configuration
-        rtMaven.tool = "Maven-3.3.9"
-        // Set Artifactory repositories for dependencies resolution and artifacts deployment.
-        rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-        rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+    stage ('Build') {
+        git url: 'https://github.com/corydissinger/mtgo-best-bot.git'
     }
 
-    stage('Maven build') {
-        buildInfo = rtMaven.run pom: 'mtgo-best-bot/pom.xml', goals: 'clean install'
+    stage ('Artifactory configuration') {
+        server = Artifactory.server localhost
+
+        rtMaven = Artifactory.newMavenBuild()
+        rtMaven.tool = autoinstall // Tool name from Jenkins configuration
+        rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
+        rtMaven.resolver releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot', server: server
+        rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+
+        buildInfo = Artifactory.newBuildInfo()
     }
 
-    stage('Publish build info') {
+    stage ('Test') {
+        rtMaven.run pom: 'mtgo-best-bot/pom.xml', goals: 'clean test'
+    }
+
+    stage ('Install') {
+        rtMaven.run pom: 'mtgo-best-bot/pom.xml', goals: 'install', buildInfo: buildInfo
+    }
+
+    stage ('Deploy') {
+        rtMaven.deployer.deployArtifacts buildInfo
+    }
+
+    stage ('Publish build info') {
         server.publishBuildInfo buildInfo
     }
 }

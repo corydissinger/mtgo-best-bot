@@ -27,12 +27,6 @@
 			<id>org.springframework.maven.snapshot</id>
 			<name>Spring Maven Snapshot Repository</name>
 			<url>http://repo.spring.io/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
 		</repository>
 		<!-- For developing against latest Spring milestones -->
 		<repository>

@@ -4,7 +4,7 @@ node {
     def rtMaven
 
     stage ('Build') {
-        git url: 'https://github.com/corydissinger/mtgo-best-bot.git'
+        git branch: 'master', credentialsId: '44716ae8-58f8-43cf-88e0-9c9303e7c7fa', url: 'https://github.com/corydissinger/mtgo-best-bot.git'
     }
 
     stage ('Artifactory configuration') {

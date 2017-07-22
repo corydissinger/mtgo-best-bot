@@ -55,14 +55,32 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-	<modules>
-		<module>bot-ui</module>
-		<module>bot-model</module>
-		<module>bot-wikiprice-scraper</module>
-		<module>bot-client</module>
-		<module>bot-api</module>
-		<module>bot-api-wrapper</module>
-		<module>bot-orchestrator</module>
-    </modules>
-
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>bot-model</module>
+				<module>bot-wikiprice-scraper</module>
+				<module>bot-client</module>
+				<module>bot-api</module>
+				<module>bot-api-wrapper</module>
+				<module>bot-orchestrator</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>ui</id>
+			<modules>
+				<module>bot-ui</module>
+				<module>bot-model</module>
+				<module>bot-wikiprice-scraper</module>
+				<module>bot-client</module>
+				<module>bot-api</module>
+				<module>bot-api-wrapper</module>
+				<module>bot-orchestrator</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>

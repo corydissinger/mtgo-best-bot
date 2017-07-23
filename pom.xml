@@ -55,6 +55,14 @@
 		</pluginRepository>
 	</pluginRepositories>
 
+	<distributionManagement>
+		<repository>
+			<id>mtgo-best-bot-releases</id>
+			<name>local-artifactory</name>
+			<url>http://192.168.1.4:8081/artifactory</url>
+		</repository>
+	</distributionManagement>
+
 	<profiles>
 		<profile>
 			<id>default</id>

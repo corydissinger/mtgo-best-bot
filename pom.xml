@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cd.bot</groupId>
-	<artifactId>mtgo-best-bot</artifactId>
-	<name>mtgo-best-bot</name>
+	<artifactId>mtgo-best</artifactId>
+	<name>mtgo-best</name>
 	<packaging>pom</packaging>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -16,7 +16,7 @@
 
 	<properties>
 		<java-version>1.8</java-version>
-		<project.version>1.0.1</project.version>
+		<project.version>1.0.3</project.version>
         <org.aspectj-version>1.8.10</org.aspectj-version>
         <org.slf4j-version>1.7.25</org.slf4j-version>
 	</properties>
@@ -63,26 +63,8 @@
 		</repository>
 	</distributionManagement>
 
-	<profiles>
-		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<modules>
-				<module>bot-model</module>
-				<module>bot-wikiprice-scraper</module>
-				<module>bot-client</module>
-				<module>bot-orchestrator</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>ui</id>
-			<modules>
-				<module>bot-ui</module>
-				<module>bot-api</module>
-				<module>bot-api-wrapper</module>
-			</modules>
-		</profile>
-	</profiles>
+	<modules>
+		<module>bot</module>
+		<module>ui</module>
+	</modules>
 </project>

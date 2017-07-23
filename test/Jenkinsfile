@@ -1,0 +1,20 @@
+node {
+    agent {
+        label 'desktop'
+    }
+
+    def server
+    def downloadSpec = """{
+     "files": [
+      {
+          "pattern": "mtgo-best-bot-releases/*.jar",
+          "target": "mtgo-best-bot/"
+        }
+     ]
+    }"""
+
+    stage ('Get latest') {
+        server = Artifactory.server 'localhost'
+        server.download(downloadSpec)
+    }
+}

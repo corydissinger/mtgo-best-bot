@@ -1,15 +1,9 @@
-pipeline {
+node {
     agent {
         label 'desktop'
     }
 
     def server = Artifactory.server 'localhost'
     def downloadSpec = readFile 'test/resources/props-download.json'
-
-    stages {
-        stage ('Get latest') {
-            server = Artifactory.server 'localhost'
-            server.download(downloadSpec)
-        }
-    }
+    server.download(downloadSpec)
 }

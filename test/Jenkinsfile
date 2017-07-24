@@ -3,15 +3,8 @@ pipeline {
         label 'desktop'
     }
 
-    def server
-    def downloadSpec = {
-     "files": [
-      {
-          "pattern": "mtgo-best-bot-releases/*.jar",
-          "target": "mtgo-best-bot/"
-        }
-     ]
-    }
+    def server = Artifactory.server 'localhost'
+    def downloadSpec = readFile 'test/resources/props-download.json'
 
     stages {
         stage ('Get latest') {

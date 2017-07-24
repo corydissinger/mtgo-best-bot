@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "pattern": "mtgo-best-bot-releases/*.jar",
+      "target": "mtgo-best-bot/"
+    }
+  ]
+}

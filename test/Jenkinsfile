@@ -1,9 +1,11 @@
 node {
-    agent {
-        label 'desktop'
+    def server
+    def downloadSpec
+
+    stage ('Download') {
+        server = Artifactory.server 'localhost'
+        downloadSpec = readFile 'test/resources/props-download.json'
+        server.download(downloadSpec)
     }
 
-    def server = Artifactory.server 'localhost'
-    def downloadSpec = readFile 'test/resources/props-download.json'
-    server.download(downloadSpec)
 }
